@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="5dp"
+    android:id="@+id/rel_selected">
+    <!-- Thumbnail Image -->
+    <com.android.volley.toolbox.NetworkImageView
+        android:id="@+id/pic_selected"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginRight="8dp" />
+
+    <TextView
+        android:id="@+id/title_selected"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/thumbnail"
+        android:layout_toRightOf="@+id/thumbnail"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        style="@style/Base.TextAppearance.AppCompat.Small.Inverse" />
+
+    <TextView
+        android:id="@+id/bio_selected"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="15dp"
+        style="@style/Base.TextAppearance.AppCompat.Small"
+        android:layout_below="@+id/pic_selected"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="25dp" />
+
+    <TextView
+        android:id="@+id/exp_selected"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:textColor="@color/year"
+        android:textSize="@dimen/year" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/out_of_5_selected"
+        android:id="@+id/out_of_selected_tv"
+        android:layout_alignTop="@+id/ratings_img_selected"
+        android:layout_toRightOf="@+id/ratings_img_selected"
+        android:layout_toEndOf="@+id/ratings_img_selected"
+        android:layout_marginLeft="7dp"
+        android:layout_marginStart="23dp"
+        android:layout_marginTop="6dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/ratings_text"
+        android:id="@+id/ratings_text"
+        android:layout_alignTop="@+id/out_of_selected_tv"
+        android:layout_marginLeft="13dp"
+        android:layout_alignParentStart="false"
+        android:layout_toEndOf="@+id/ratings_img_selected" />
+    <ImageView
+        android:id="@+id/ratings_img_selected"
+        android:layout_width="100dp"
+        android:layout_height="30dp"
+        android:src="@drawable/paws_rating"
+        android:contentDescription="ratings"
+        android:layout_below="@+id/first_name_selected"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp" />
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/request_button"
+        android:id="@+id/request_button"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/first_name_selected"
+        android:id="@+id/first_name_selected"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+</RelativeLayout>

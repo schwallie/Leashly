@@ -1,0 +1,200 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/register_layout">
+    <android.support.v7.widget.Toolbar
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimaryDark"/>
+
+    <EditText
+        android:id="@+id/username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/email_register"
+        android:ems="10"
+        android:inputType="textEmailAddress|textWebEmailAddress"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:textColorHint="#cccccc" />
+
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/pass_register"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:layout_below="@+id/username"
+	    android:layout_marginTop="-2dp"
+	    android:padding="10dp"
+	    android:textColorHint="#cccccc"/>
+    <Button
+        android:id="@+id/register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/button_register"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:hint="@string/first_name_register"
+        android:ems="10"
+        android:id="@+id/first_name"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/password"
+        android:textColorHint="#cccccc"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:hint="@string/last_name_register"
+        android:ems="10"
+        android:id="@+id/last_name"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/first_name"
+        android:textColorHint="#cccccc"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:hint="@string/address_1_register"
+        android:ems="10"
+        android:id="@+id/address_1"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/last_name"
+        android:textColorHint="#cccccc" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/address_2_register"
+        android:ems="10"
+        android:id="@+id/address_2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/address_1"
+        android:textColorHint="#cccccc"
+        android:inputType="text" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_cities"
+        android:layout_below="@+id/address_2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:focusableInTouchMode="true"
+        android:prompt="@string/cities_prompt"
+        android:layout_toLeftOf="@+id/spinner_states"
+        android:layout_toStartOf="@+id/spinner_states" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_states"
+        android:focusableInTouchMode="true"
+        android:prompt="@string/states_prompt"
+        android:layout_toEndOf="@+id/address_2"
+        android:layout_below="@+id/address_2"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textMultiLine"
+        android:ems="10"
+        android:id="@+id/instructions_text"
+        android:lines="2"
+        android:minLines="2"
+        android:layout_above="@+id/register"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/how_do_we_get_in"
+        android:id="@+id/how_to_get_in"
+        android:layout_above="@+id/spinner_keys"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_keys"
+        android:focusableInTouchMode="true"
+        android:prompt="@string/key_prompt"
+        android:layout_toEndOf="@+id/address_2"
+        android:layout_above="@+id/instructions_text"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/get_to_best_friend"
+        android:id="@+id/get_to_best_friend"
+        android:layout_alignTop="@+id/instructions_text"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:hint="@string/dog_1"
+        android:ems="10"
+        android:id="@+id/dog_1"
+        android:layout_above="@+id/how_to_get_in"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/register"
+        android:layout_alignEnd="@+id/register" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:hint="@string/dog_2"
+        android:ems="10"
+        android:id="@+id/dog_2"
+        android:layout_toEndOf="@+id/dog_1"
+        android:layout_toStartOf="@+id/spinner_states"
+        android:layout_above="@+id/how_to_get_in"
+        android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:hint="@string/dog_3"
+        android:ems="10"
+        android:id="@+id/dog_3"
+        android:layout_toEndOf="@+id/how_to_get_in"
+        android:layout_toStartOf="@+id/spinner_states"
+        android:layout_above="@+id/how_to_get_in"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@+id/how_to_get_in" />
+
+
+</RelativeLayout>
