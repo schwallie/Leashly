@@ -12,15 +12,20 @@ import android.widget.Button;
 /**
  * Created by schwallie on 11/18/2014.
  */
-
-
-
-
 public class WalkerMain extends ActionBarActivity implements View.OnClickListener{
     private Button mActive;
+    public String user = null;
+    public Integer user_id = 0;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.walker_app);
+        Bundle extras = getIntent().getExtras();
+
+        if (extras != null) {
+            user = extras.getString("user");
+            user_id = extras.getInt("user_id");
+            Log.d("In WalkerMain!", user);
+        }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (toolbar != null) {
             setSupportActionBar(toolbar);
@@ -32,26 +37,13 @@ public class WalkerMain extends ActionBarActivity implements View.OnClickListene
     @Override
     public void onClick(View v) {
         // TODO Auto-generated method stub
-        Bundle extras = getIntent().getExtras();
-        String user = null;
-        Integer user_id = 0;
-        if (extras != null) {
-            user = extras.getString("user");
-            user_id = extras.getInt("user_id");
-            Log.d("In WalkerMain!", user);
-        }
-        switch (v.getId()) {
-            case R.id.go_active:
                 Intent i = new Intent(this, WalkerActive.class);
                 i.putExtra("user", user);
                 i.putExtra("user_id", user_id);
                 startActivity(i);
-                break;
 
-            default:
-                break;
         }
     }
-}
+
 
 

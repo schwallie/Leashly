@@ -5,18 +5,14 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationRequest;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
@@ -108,7 +104,6 @@ public class WalkerActive extends ActionBarActivity implements
             lat = l.getLatitude();
             lon = l.getLongitude();
         }
-        Toast.makeText(this, lat.toString(), Toast.LENGTH_SHORT).show();
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             user = extras.getString("user");
@@ -178,7 +173,6 @@ public class WalkerActive extends ActionBarActivity implements
                 success = json_update.getInt(TAG_SUCCESS);
                 if (success == 1) {
                     Log.d("Updated Activity!", json_update.toString());
-                    finish();
                     return json_update.getString(TAG_MESSAGE);
                 }else{
                     Log.d("Registering Failure!", json_update.getString(TAG_MESSAGE));
@@ -196,9 +190,6 @@ public class WalkerActive extends ActionBarActivity implements
         protected void onPostExecute(String file_url) {
             // dismiss the dialog once product deleted
             pDialog.dismiss();
-            if (file_url != null){
-                Toast.makeText(WalkerActive.this, file_url, Toast.LENGTH_LONG).show();
-            }
 
         }
 
