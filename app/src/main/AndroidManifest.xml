@@ -11,10 +11,9 @@ android:versionName="1.0" >
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
-    <permission android:name="com.example.gcm.permission.C2D_MESSAGE"
+    <permission android:name="ly.leash.Leashly.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
-    <uses-permission android:name="com.example.gcm.permission.C2D_MESSAGE" />
-    />
+    <uses-permission android:name="ly.leash.Leashly.permission.C2D_MESSAGE" />
 
     <!--
  The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -29,9 +28,9 @@ android:versionName="1.0" >
             android:icon="@drawable/ic_launcher"
             android:label="@string/app_name"
             android:name="ly.leash.Leashly.app.AppController"
-
+            android:debuggable="true"
             android:theme="@style/AppTheme">
-  
+
     <meta-data
         android:name="com.google.android.gms.version"
         android:value="@integer/google_play_services_version" />
@@ -81,7 +80,17 @@ android:versionName="1.0" >
                     <category android:name="android.intent.category.LAUNCHER" />
                 </intent-filter>
             </activity>
-
+            <receiver
+                android:name=".GcmBroadcastReceiver"
+                android:permission="com.google.android.c2dm.permission.SEND" >
+                <intent-filter>
+                    <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+                    <category android:name="ly.leash.Leashly" />
+                </intent-filter>
+            </receiver>
+            <service android:name=".GcmMessageHandler" />
+            <meta-data android:name="com.google.android.gms.version"
+                android:value="@integer/google_play_services_version" />
 
         </application>
 

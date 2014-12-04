@@ -1,9 +1,13 @@
 package ly.leash.Leashly;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
@@ -15,11 +19,19 @@ import org.json.JSONObject;
 import ly.leash.Leashly.app.AppController;
 import ly.leash.Leashly.model.viewer;
 import com.android.volley.toolbox.NetworkImageView;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+
+import java.io.IOException;
 
 /**
  * Created by schwallie on 11/25/2014.
  */
-public class full_view_walker extends ActionBarActivity {
+public class full_view_walker extends ActionBarActivity implements View.OnClickListener {
+    Button btnRegId;
+    EditText etRegId;
+    GoogleCloudMessaging gcm;
+    String regid;
+    String PROJECT_NUMBER = "621850944390";
     ImageLoader imageLoader = AppController.getInstance().getImageLoader();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,12 +41,16 @@ public class full_view_walker extends ActionBarActivity {
         if (toolbar != null) {
             setSupportActionBar(toolbar);
         }
+        btnRegId = (Button) findViewById(R.id.btnGetRegId);
+        etRegId = (EditText) findViewById(R.id.etRegId);
+        btnRegId.setOnClickListener(this);
         Bundle extras = getIntent().getExtras();
         String data = null;
         if (extras != null) {
             data = extras.getString("data");
         }
         Log.d("Data",data);
+
         try {
             JSONObject jsonObj = new JSONObject(getIntent().getStringExtra("data"));
             TextView bio = (TextView) findViewById(R.id.bio_selected);
@@ -53,4 +69,34 @@ public class full_view_walker extends ActionBarActivity {
         }
 
     }
-}
+
+    public void getRegId(){
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                String msg = "";
+                try {
+                    if (gcm == null) {
+                        gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
+                    }
+                    regid = gcm.register(PROJECT_NUMBER);
+                    msg = "Device registered, registration ID=" + regid;
+                    Log.i("GCM",  msg);
+
+                } catch (IOException ex) {
+                    msg = "Error :" + ex.getMessage();
+
+                }
+                return msg;
+            }
+
+            @Override
+            protected void onPostExecute(String msg) {
+                etRegId.setText(msg + "\n");
+            }
+        }.execute(null, null, null);
+    }
+    @Override
+    public void onClick(View v) {
+        getRegId();
+    } }
