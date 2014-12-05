@@ -38,6 +38,7 @@
     <string name="out_of_5_selected">"(   /5)"</string>
     <string name="ratings_text">5</string>
     <string name="first_name_selected">Chase</string>
+    <string name="new_walk">New Walk!</string>
     <string name="request_button">Request</string>
     <string-array name="cities_array">
         <item>Select City</item>

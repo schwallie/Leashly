@@ -31,6 +31,7 @@ public class full_view_walker extends ActionBarActivity implements View.OnClickL
     EditText etRegId;
     GoogleCloudMessaging gcm;
     String regid;
+    String gcm_id;
     String PROJECT_NUMBER = "621850944390";
     ImageLoader imageLoader = AppController.getInstance().getImageLoader();
     @Override
@@ -48,26 +49,27 @@ public class full_view_walker extends ActionBarActivity implements View.OnClickL
         String data = null;
         if (extras != null) {
             data = extras.getString("data");
+            Log.d("Data", data);
+
+
+            try {
+                JSONObject jsonObj = new JSONObject(getIntent().getStringExtra("data"));
+                TextView bio = (TextView) findViewById(R.id.bio_selected);
+                TextView fname = (TextView) findViewById(R.id.first_name_selected);
+                bio.setText(jsonObj.getString("bio"));
+                fname.setText(jsonObj.getString("first_name"));
+                gcm_id = jsonObj.getString("user_id");
+                if (imageLoader == null)
+                    imageLoader = AppController.getInstance().getImageLoader();
+                NetworkImageView thumbNail = (NetworkImageView) findViewById(R.id.pic_selected);
+
+
+                // thumbnail image
+                thumbNail.setImageUrl(jsonObj.getString("pic"), imageLoader);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
-        Log.d("Data",data);
-
-        try {
-            JSONObject jsonObj = new JSONObject(getIntent().getStringExtra("data"));
-            TextView bio = (TextView) findViewById(R.id.bio_selected);
-            TextView fname = (TextView) findViewById(R.id.first_name_selected);
-            bio.setText(jsonObj.getString("bio"));
-            fname.setText(jsonObj.getString("first_name"));
-            if (imageLoader == null)
-                imageLoader = AppController.getInstance().getImageLoader();
-            NetworkImageView thumbNail = (NetworkImageView) findViewById(R.id.pic_selected);
-
-
-            // thumbnail image
-            thumbNail.setImageUrl(jsonObj.getString("pic"), imageLoader);
-        } catch(JSONException e) {
-            e.printStackTrace();
-        }
-
     }
 
     public void getRegId(){
@@ -82,6 +84,7 @@ public class full_view_walker extends ActionBarActivity implements View.OnClickL
                     regid = gcm.register(PROJECT_NUMBER);
                     msg = "Device registered, registration ID=" + regid;
                     Log.i("GCM",  msg);
+                    POST2GCM.post(gcm_id);
 
                 } catch (IOException ex) {
                     msg = "Error :" + ex.getMessage();

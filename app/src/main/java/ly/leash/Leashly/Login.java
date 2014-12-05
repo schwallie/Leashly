@@ -16,6 +16,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -29,6 +31,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -39,6 +42,10 @@ public class Login extends ActionBarActivity implements OnClickListener {
 
     private EditText user, pass;
     private Button mSubmit, mRegister;
+
+    GoogleCloudMessaging gcm;
+    String regid;
+    String PROJECT_NUMBER = "621850944390";
 
     // Progress Dialog
     private ProgressDialog pDialog;
@@ -148,19 +155,19 @@ public class Login extends ActionBarActivity implements OnClickListener {
                     nameValuePairs.add(new BasicNameValuePair("user", username));
 
 //http post
-                    try{
+                    try {
                         HttpClient httpclient = new DefaultHttpClient();
                         HttpPost httppost = new HttpPost("http://leash.ly/webservice/get_data.php");
                         httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
                         HttpResponse response = httpclient.execute(httppost);
                         HttpEntity entity = response.getEntity();
                         is = entity.getContent();
-                    }catch(Exception e){
-                        Log.e("log_tag", "Error in http connection "+e.toString());
+                    } catch (Exception e) {
+                        Log.e("log_tag", "Error in http connection " + e.toString());
                     }
 //convert response to string
-                    try{
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(is,"iso-8859-1"),8);
+                    try {
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
                         StringBuilder sb = new StringBuilder();
                         String line = null;
                         while ((line = reader.readLine()) != null) {
@@ -168,32 +175,32 @@ public class Login extends ActionBarActivity implements OnClickListener {
                         }
                         is.close();
 
-                        result=sb.toString();
-                    }catch(Exception e){
-                        Log.e("log_tag", "Error converting result "+e.toString());
+                        result = sb.toString();
+                    } catch (Exception e) {
+                        Log.e("log_tag", "Error converting result " + e.toString());
                     }
 
 //parse json data
-                    try{
+                    try {
                         JSONArray jArray = new JSONArray(result);
-                        for(int i=0;i<jArray.length();i++){
+                        for (int i = 0; i < jArray.length(); i++) {
                             json_data = jArray.getJSONObject(i).toString();
                         }
-                    }
-                    catch(JSONException e){
-                        Log.e("log_tag", "Error parsing data "+e.toString());
+                    } catch (JSONException e) {
+                        Log.e("log_tag", "Error parsing data " + e.toString());
                     }
 
 
-                    try{
+                    try {
                         JSONObject jobj = new JSONObject(json_data);
                         walker = jobj.getInt("walker");
                         user_id = jobj.getInt("id");
-                        lat  = jobj.getDouble("lat");
+                        lat = jobj.getDouble("lat");
                         lon = jobj.getDouble("long");
+                        registerId(user_id);
 
 
-                    } catch(JSONException e){
+                    } catch (JSONException e) {
                         e.printStackTrace();
                         // do something
                     }
@@ -210,7 +217,7 @@ public class Login extends ActionBarActivity implements OnClickListener {
                         Intent i = new Intent(getApplicationContext(), WalkerMain.class);
                         finish();
                         i.putExtra("user", username);
-                        i.putExtra("user_id",user_id);
+                        i.putExtra("user_id", user_id);
                         startActivity(i);
                         return json.getString(TAG_MESSAGE);
                     }
@@ -226,6 +233,46 @@ public class Login extends ActionBarActivity implements OnClickListener {
 
             return null;
 
+        }
+
+
+        public void registerId(final Integer user_id_to_use){
+            new AsyncTask<Void, Void, String>() {
+                @Override
+                protected String doInBackground(Void... params) {
+                    String msg = "";
+                    try {
+                        if (gcm == null) {
+                            gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
+                        }
+                        regid = gcm.register(PROJECT_NUMBER);
+                        msg = "Device registered, registration ID=" + regid;
+                        Log.i("GCM",  msg);
+                        //POST2GCM.post(regid);
+
+                        ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+                        nameValuePairs.add(new BasicNameValuePair("user_id", user_id_to_use.toString()));
+                        nameValuePairs.add(new BasicNameValuePair("gcm", regid));
+
+//http post
+                        try {
+                            HttpClient httpclient = new DefaultHttpClient();
+                            HttpPost httppost = new HttpPost("http://leash.ly/webservice/register_user_gcm.php");
+                            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                            HttpResponse response = httpclient.execute(httppost);
+                            HttpEntity entity = response.getEntity();
+                            InputStream is = null;
+                            is = entity.getContent();
+                        } catch (Exception e) {
+                            Log.e("log_tag", "Error in http connection " + e.toString());
+                        }
+                    } catch (IOException ex) {
+                        msg = "Error :" + ex.getMessage();
+
+                    }
+                    return msg;
+                }
+            }.execute(null, null, null);
         }
 
         protected void onPostExecute(String file_url) {

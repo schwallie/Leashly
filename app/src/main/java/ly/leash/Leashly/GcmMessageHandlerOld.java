@@ -16,11 +16,11 @@ import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.widget.Toast;
 
-public class GcmMessageHandler extends IntentService {
+public class GcmMessageHandlerOld extends IntentService {
 
     String mes;
     private Handler handler;
-    public GcmMessageHandler() {
+    public GcmMessageHandlerOld() {
         super("GcmMessageHandler");
     }
 
@@ -72,7 +72,7 @@ public class GcmMessageHandler extends IntentService {
         Integer mId = 0;
         mNotificationManager.notify(mId, mBuilder.build());
         Log.i("GCM", "Received : (" +messageType+")  "+extras.getString("title"));
-        GcmBroadcastReceiver.completeWakefulIntent(intent);
+        GCMBroadcastOld.completeWakefulIntent(intent);
 
     }
 

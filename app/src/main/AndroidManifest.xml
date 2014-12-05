@@ -72,6 +72,10 @@ android:versionName="1.0" >
                 android:label="@string/app_name" >
             </activity>
             <activity
+                android:name="ly.leash.Leashly.WalkerRequest"
+                android:label="@string/app_name" >
+            </activity>
+            <activity
                 android:name="ly.leash.Leashly.FrontPage"
                 android:label="@string/app_name" >
 
@@ -88,7 +92,7 @@ android:versionName="1.0" >
                     <category android:name="ly.leash.Leashly" />
                 </intent-filter>
             </receiver>
-            <service android:name=".GcmMessageHandler" />
+            <service android:name=".GcmIntentService" />
             <meta-data android:name="com.google.android.gms.version"
                 android:value="@integer/google_play_services_version" />
 
