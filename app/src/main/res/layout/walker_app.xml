@@ -1,24 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <android.support.v7.widget.Toolbar
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/colorPrimaryDark"/>
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal">
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:orientation="vertical"
+android:layout_height="match_parent"
+tools:context=".MainActivity">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/walker_app_go_active"
-            android:id="@+id/go_active"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" />
+<include layout="@layout/toolbar" />
+    <android.support.v4.widget.DrawerLayout
+    android:layout_width="match_parent"
+    android:id="@+id/drawerLayout_walker"
+    android:layout_height="match_parent"
+        android:clickable="false">
+
+    <!-- activity view -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/walker_app_go_active"
+                android:id="@+id/go_active"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true" />
+        </RelativeLayout>
+        <!-- navigation drawer -->
+    <RelativeLayout
+        android:layout_gravity="left|start"
+        android:layout_width="match_parent"
+        android:background="#fff"
+        android:layout_height="match_parent">
+
+        <ListView
+            android:id="@+id/left_drawer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="#eee"
+            android:background="#fff"
+            android:dividerHeight="1dp" />
     </RelativeLayout>
-</LinearLayout>
+
+</android.support.v4.widget.DrawerLayout>
+    </LinearLayout>

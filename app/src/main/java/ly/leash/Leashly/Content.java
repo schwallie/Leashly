@@ -27,12 +27,13 @@ public class Content implements Serializable {
         registration_ids.add(regId);
     }
 
-    public void createData(String title, String message){
+    public void createData(String title, String message, String id){
         if(data == null)
             data = new HashMap<String,String>();
 
         data.put("title", title);
         data.put("message", message);
+        data.put("id", id);
     }
 
 

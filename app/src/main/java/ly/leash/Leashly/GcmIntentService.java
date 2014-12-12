@@ -63,10 +63,10 @@ public class GcmIntentService extends IntentService {
                 }
                 String cont = intent.getExtras().getString("message");
                 String title = intent.getExtras().getString("title");
-
+                String user_id = intent.getExtras().getString("id");
                 Log.i(TAG, "Completed work @ " + SystemClock.elapsedRealtime());
                 // Post notification of received message.
-                sendNotification("Received: ", cont, title);
+                sendNotification(user_id, cont, title);
                 Log.i(TAG, "Received: " + extras.toString());
             }
         }
@@ -86,7 +86,7 @@ public class GcmIntentService extends IntentService {
 
         int requestID = (int) System.currentTimeMillis();
         Intent notificationIntent = new Intent(this, WalkerRequest.class);
-        Log.d("Intent","setting content intent");
+        notificationIntent.putExtra("id", msg);
         PendingIntent contentIntent = PendingIntent.getActivity(this, requestID, notificationIntent, PendingIntent.FLAG_ONE_SHOT);
 
         NotificationCompat.Builder mBuilder =

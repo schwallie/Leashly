@@ -1,14 +1,17 @@
 package ly.leash.Leashly;
 
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
@@ -42,9 +45,13 @@ public class full_view_walker extends ActionBarActivity implements View.OnClickL
         if (toolbar != null) {
             setSupportActionBar(toolbar);
         }
-        btnRegId = (Button) findViewById(R.id.btnGetRegId);
-        etRegId = (EditText) findViewById(R.id.etRegId);
-        btnRegId.setOnClickListener(this);
+        FloatingActionButton fabButton = new FloatingActionButton.Builder(this)
+                .withDrawable(getResources().getDrawable(R.drawable.checkmark))
+                .withButtonColor(Color.BLUE)
+                .withGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL)
+                .withMargins(0, 0, 16, 16)
+                .create();
+        fabButton.setOnClickListener(this);
         Bundle extras = getIntent().getExtras();
         String data = null;
         if (extras != null) {
@@ -95,7 +102,7 @@ public class full_view_walker extends ActionBarActivity implements View.OnClickL
 
             @Override
             protected void onPostExecute(String msg) {
-                etRegId.setText(msg + "\n");
+                Toast.makeText(full_view_walker.this, "Requesting Walker!", Toast.LENGTH_SHORT).show();
             }
         }.execute(null, null, null);
     }

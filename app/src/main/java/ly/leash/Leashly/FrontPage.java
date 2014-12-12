@@ -1,11 +1,11 @@
 package ly.leash.Leashly;
 
-import android.app.ActionBar;
-import android.app.Activity;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -14,21 +14,31 @@ import android.widget.Button;
  */
 public class FrontPage extends ActionBarActivity implements View.OnClickListener {
     private Button mSubmit, mRegister;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.front_page);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        if (toolbar != null) {
-            setSupportActionBar(toolbar);
-        }
-        // setup buttons
-        mSubmit = (Button) findViewById(R.id.signup_front);
-        mRegister = (Button) findViewById(R.id.register_front);
+        Boolean status = PreferenceData.getUserLoggedInStatus(this);
+        Log.d("status", status + "");
+        if(status) {
+            LoginStartup userdata = new LoginStartup(PreferenceData.getLoggedInEmailUser(this), getApplicationContext());
+            userdata.execute(PreferenceData.getLoggedInEmailUser(this));
 
-        // register listeners
-        mSubmit.setOnClickListener(this);
-        mRegister.setOnClickListener(this);
+        } else {
+            setContentView(R.layout.front_page);
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            if (toolbar != null) {
+                setSupportActionBar(toolbar);
+            }
+            // setup buttons
+
+            mSubmit = (Button) findViewById(R.id.signup_front);
+            mRegister = (Button) findViewById(R.id.register_front);
+
+            // register listeners
+            mSubmit.setOnClickListener(this);
+            mRegister.setOnClickListener(this);
+        }
     }
     @Override
     public void onClick(View v) {

@@ -66,8 +66,7 @@ public class POST2GCM {
                     e.printStackTrace();
                 }
                 content.addRegId(gcm_id);
-                content.createData("New Walk!", "You have a new walk waiting for you!");
-
+                content.createData("New Walk!", "You have a new walk waiting for you!", params[0]);
 
                 // 1. URL
                 URL url = new URL("https://android.googleapis.com/gcm/send");
@@ -127,7 +126,6 @@ public class POST2GCM {
 
 
     public static void post(String regId){
-        Log.d("regId", "Msg: "+regId);
         PostAsync task_ = new PostAsync();
         task_.execute(regId);
 

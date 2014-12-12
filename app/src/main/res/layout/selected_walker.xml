@@ -42,29 +42,6 @@
         android:textColor="@color/year"
         android:textSize="@dimen/year" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="@string/out_of_5_selected"
-        android:id="@+id/out_of_selected_tv"
-        android:layout_alignTop="@+id/ratings_img_selected"
-        android:layout_toRightOf="@+id/ratings_img_selected"
-        android:layout_toEndOf="@+id/ratings_img_selected"
-        android:layout_marginLeft="7dp"
-        android:layout_marginStart="23dp"
-        android:layout_marginTop="6dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="@string/ratings_text"
-        android:id="@+id/ratings_text"
-        android:layout_alignTop="@+id/out_of_selected_tv"
-        android:layout_marginLeft="13dp"
-        android:layout_alignParentStart="false"
-        android:layout_toEndOf="@+id/ratings_img_selected" />
     <ImageView
         android:id="@+id/ratings_img_selected"
         android:layout_width="100dp"
@@ -74,21 +51,6 @@
         android:layout_below="@+id/first_name_selected"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp" />
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/request_button"
-        android:id="@+id/btnGetRegId"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
-    <EditText
-        android:id="@+id/etRegId"
-        android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:layout_above="@+id/btnGetRegId"
-        android:layout_toRightOf="@+id/title_selected"
-        android:layout_toEndOf="@+id/title_selected" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -98,4 +60,15 @@
         android:id="@+id/first_name_selected"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/backbutton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:src="@drawable/back_button"
+        android:paddingBottom="32dp"
+        android:paddingLeft="24dp" />
 </RelativeLayout>

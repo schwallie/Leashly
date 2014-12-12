@@ -79,32 +79,38 @@
             android:text="" />
     </ScrollView>
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
+    <ImageButton
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/deny_button"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:clickable="true"
+        android:paddingLeft="85dp"
+        android:src="@drawable/x_button"
+        android:paddingBottom="36dp"
+        android:background="@null" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Thanks for accepting!"
+        android:id="@+id/thanks_accept"
         android:layout_below="@+id/textAreaScroller"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_centerHorizontal="true"
+        android:paddingTop="50dp"
+        android:visibility="invisible" />
 
-        <Button
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Deny"
-            android:layout_weight="1"
-            android:id="@+id/deny_request"
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/accept_request"
-            android:layout_toEndOf="@+id/accept_request" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ACCEPT"
-            android:id="@+id/accept_request"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" />
-
-    </RelativeLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Please click below when you start your walk!"
+        android:id="@+id/click_below_txt"
+        android:layout_below="@+id/thanks_accept"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="59dp"
+        android:visibility="invisible" />
 
 </RelativeLayout>

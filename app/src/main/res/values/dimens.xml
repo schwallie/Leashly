@@ -6,4 +6,5 @@
         <dimen name="rating">10dip</dimen>
         <dimen name="genre">13dip</dimen>
         <dimen name="year">10dip</dimen>
+
 </resources>
