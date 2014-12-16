@@ -1,8 +1,16 @@
 package ly.leash.Leashly;
 
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
@@ -12,7 +20,13 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -21,6 +35,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -35,6 +51,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -45,13 +62,36 @@ import static ly.leash.Leashly.R.layout.activity_maps;
 /**
  * Created by schwallie on 12/7/2014.
  */
-public class WalkStarted extends ActionBarActivity implements View.OnClickListener {
+public class WalkStarted extends ActionBarActivity implements View.OnClickListener,
+        GooglePlayServicesClient.ConnectionCallbacks,
+        GooglePlayServicesClient.OnConnectionFailedListener,
+        LocationListener
+{
 
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     String user = null;
     Button walk_fin;
     ImageButton camera_btn;
+    // Milliseconds per second
+    private static final int MILLISECONDS_PER_SECOND = 1000;
+    // Update frequency in seconds
+    public static final int UPDATE_INTERVAL_IN_SECONDS = 45;
+    // Update frequency in milliseconds
+    private static final long UPDATE_INTERVAL =
+            MILLISECONDS_PER_SECOND * UPDATE_INTERVAL_IN_SECONDS;
+    // The fastest update frequency, in seconds
+    private static final int FASTEST_INTERVAL_IN_SECONDS = 45;
+    // A fast frequency ceiling in milliseconds
+    private static final long FASTEST_INTERVAL =
+            MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;
+    private final static int
+            CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
+    LocationRequest mLocationRequest;
+    LocationClient mLocationClient;
+    LatLng prev_latlng;
+    PowerManager.WakeLock wakeLock;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,9 +110,22 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         camera_btn = (ImageButton) findViewById(R.id.camera_btn);
         walk_fin.setOnClickListener(this);
         camera_btn.setOnClickListener(this);
+        mLocationRequest = LocationRequest.create();
+        // Use high accuracy
+        mLocationRequest.setPriority(
+                LocationRequest.PRIORITY_HIGH_ACCURACY);
+        // Set the update interval to 5 seconds
+        mLocationRequest.setInterval(UPDATE_INTERVAL);
+        // Set the fastest update interval to 1 second
+        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
+        boolean mUpdatesRequested = true;
+        mLocationClient = new LocationClient(this, this, this);
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                "MyWakelockTag");
+        wakeLock.acquire();
         setUpMapIfNeeded();
     }
-    static final int REQUEST_IMAGE_CAPTURE = 1;
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -85,6 +138,32 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         Log.d("ID",v.getId()+"");
         switch (v.getId()) {
             case R.id.walk_finished_button:
+                wakeLock.release();
+                mMap.snapshot(new GoogleMap.SnapshotReadyCallback() {
+                    public void onSnapshotReady(Bitmap bitmap) {
+                        // Write image to disk
+                        try {
+                            FileOutputStream out = new FileOutputStream("/mnt/sdcard/map.png");
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                });
+                UploadImage uim = new UploadImage();
+                int response = 0;
+                try {
+                    response= uim.execute("/mnt/sdcard/map.png").get();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+
+                System.out.println("RES : " + response);
+
+
                 Animation fadeout = AnimationUtils.loadAnimation(this, R.anim.fadeout);
                 walk_fin.startAnimation(fadeout);
                 Animation fadein = AnimationUtils.loadAnimation(this, R.anim.fadein);
@@ -98,8 +177,8 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         }
     }
 
-        @Override
-        protected void onResume() {
+    @Override
+    protected void onResume() {
             super.onResume();
             setUpMapIfNeeded();
         }
@@ -151,40 +230,129 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         }
         Log.d("data", data+"");
         double lat, longitude;
-        String dog = "";
         try{
             JSONObject jobj = new JSONObject(data);
             lat = jobj.getDouble("lat");
             longitude = jobj.getDouble("long");
-            dog += jobj.getString("dog_1");
-            if(!jobj.getString("dog_2").equals("")) {
-                dog += " & ";
-            }
-            dog += jobj.getString("dog_2");
-            if(!jobj.getString("dog_3").equals("")) {
-                dog += " & ";
-            }
-            dog += jobj.getString("dog_3");
 
         } catch(JSONException e){
-            dog = "";
             lat = 0.0;
             longitude = 0.0;
             e.printStackTrace();
             // do something
         }
-        Log.d("dog_1", dog.getClass().toString());
-        mMap.setMyLocationEnabled(false); // false to disable
-        MarkerOptions marker = new MarkerOptions().position(new LatLng(lat, longitude)).title(dog);
-        marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.doghouse));
+        mMap.setMyLocationEnabled(true); // false to disable
+        prev_latlng = new LatLng(lat, longitude);
+        MarkerOptions marker = new MarkerOptions().position(prev_latlng);
         final Marker marker_new = mMap.addMarker(marker);
         marker_new.showInfoWindow();
         mMap.getUiSettings().setZoomControlsEnabled(false);
+        mMap.getUiSettings().setAllGesturesEnabled(false);
         CameraPosition cameraPosition = new CameraPosition.Builder().target(
-                new LatLng(lat, longitude)).zoom(15).build();
+                prev_latlng).zoom(15).build();
 
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
+
+    }
+    @Override
+    public void onLocationChanged(Location location) {
+        // Report to the UI that the location was
+        double lat = location.getLatitude();
+        double longitude = location.getLongitude();
+        Polyline line = mMap.addPolyline(new PolylineOptions()
+                .add(new LatLng(lat, longitude), prev_latlng)
+                .width(30)
+                .color(R.color.primaryColor));
+        prev_latlng = new LatLng(lat, longitude);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mLocationClient.connect();
+    }
+    @Override
+    public void onConnected(Bundle dataBundle) {
+        // Display the connection status
+        Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
+        // If already requested, start periodic updates
+        mLocationClient.requestLocationUpdates(mLocationRequest, this);
+
+    }
+    @Override
+    public void onDisconnected() {
+        // Display the connection status
+        Toast.makeText(this, "Disconnected. Please re-connect.",
+                Toast.LENGTH_SHORT).show();
+    }
+    @Override
+    protected void onStop() {
+        // If the client is connected
+        if (mLocationClient.isConnected()) {
+            /*
+             * Remove location updates for a listener.
+             * The current Activity is the listener, so
+             * the argument is "this".
+             */
+            mLocationClient.removeLocationUpdates(this);
+        }
+        /*
+         * After disconnect() is called, the client is
+         * considered "dead".
+         */
+        mLocationClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        /*
+         * Google Play services can resolve some errors it detects.
+         * If the error has a resolution, try sending an Intent to
+         * start a Google Play services activity that can resolve
+         * error.
+         */
+        if (connectionResult.hasResolution()) {
+            try {
+                // Start an Activity that tries to resolve the error
+                connectionResult.startResolutionForResult(
+                        this,
+                        CONNECTION_FAILURE_RESOLUTION_REQUEST);
+                /*
+                * Thrown if Google Play services canceled the original
+                * PendingIntent
+                */
+            } catch (IntentSender.SendIntentException e) {
+                // Log the error
+                e.printStackTrace();
+            }
+        } else {
+            /*
+             * If no resolution is available, display a dialog to the
+             * user with the error.
+             */
+            //showErrorDialog(connectionResult.getErrorCode());
+        }
+
+    }
+    public static class ErrorDialogFragment extends DialogFragment {
+        // Global field to contain the error dialog
+        private Dialog mDialog;
+        // Default constructor. Sets the dialog field to null
+        public ErrorDialogFragment() {
+            super();
+            mDialog = null;
+        }
+        // Set the dialog to display
+        public void setDialog(Dialog dialog) {
+            mDialog = dialog;
+        }
+        // Return a Dialog to the DialogFragment.
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            return mDialog;
+        }
     }
     public class MapPosition extends AsyncTask<String, String, String> {
 

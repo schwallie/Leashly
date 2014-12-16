@@ -42,7 +42,7 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
         }
         fabButton = new FloatingActionButton.Builder(this)
                 .withDrawable(getResources().getDrawable(R.drawable.checkmark))
-                .withButtonColor(Color.BLUE)
+                .withButtonColor(R.color.primaryColor)
                 .withGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL)
                 .withMargins(0, 0, 16, 16)
                 .create();
@@ -58,12 +58,14 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
         Log.d("ID",v.getId()+"");
         switch (v.getId()) {
             case -1:
+                POST2GCM.post(id, "AcceptWalk");
                 Animation fadeout = AnimationUtils.loadAnimation(this, R.anim.fadeout);
                 fabButton.startAnimation(fadeout);
                 deny.startAnimation(fadeout);
                 Animation fadein = AnimationUtils.loadAnimation(this, R.anim.fadein);
                 thanks_txt.startAnimation(fadein);
                 click_below.startAnimation(fadein);
+
                 mHandler.postDelayed(new Runnable() {
                     public void run() {
 addNewFab();
@@ -82,7 +84,7 @@ addNewFab();
     public void addNewFab() {
         acceptFabButton = new FloatingActionButton.Builder(this)
                 .withDrawable(getResources().getDrawable(R.drawable.checkmark))
-                .withButtonColor(Color.BLUE)
+                .withButtonColor(R.color.primaryColor)
                 .withGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL)
 
                 .withButtonSize(70)
@@ -91,6 +93,7 @@ addNewFab();
         acceptFabButton.setOnClickListener(new View.OnClickListener() {
                                                @Override
                                                public void onClick(View v) {
+                                                   //NEED TO SEND GCM TO USER
                                                    Intent i = new Intent(getApplicationContext(),WalkStarted.class);
                                                    i.putExtra("user", id);
                                                    startActivity(i);

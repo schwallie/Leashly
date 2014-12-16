@@ -47,7 +47,7 @@ public class full_view_walker extends ActionBarActivity implements View.OnClickL
         }
         FloatingActionButton fabButton = new FloatingActionButton.Builder(this)
                 .withDrawable(getResources().getDrawable(R.drawable.checkmark))
-                .withButtonColor(Color.BLUE)
+                .withButtonColor(R.color.primaryColor)
                 .withGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL)
                 .withMargins(0, 0, 16, 16)
                 .create();
@@ -88,12 +88,12 @@ public class full_view_walker extends ActionBarActivity implements View.OnClickL
                     if (gcm == null) {
                         gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
                     }
-                    regid = gcm.register(PROJECT_NUMBER);
-                    msg = "Device registered, registration ID=" + regid;
-                    Log.i("GCM",  msg);
-                    POST2GCM.post(gcm_id);
+                    //regid = gcm.register(PROJECT_NUMBER);
+                    //msg = "Device registered, registration ID=" + regid;
+                    //Log.i("GCM",  msg);
+                    POST2GCM.post(gcm_id, "NewWalk");
 
-                } catch (IOException ex) {
+                } catch (Exception ex) {
                     msg = "Error :" + ex.getMessage();
 
                 }
