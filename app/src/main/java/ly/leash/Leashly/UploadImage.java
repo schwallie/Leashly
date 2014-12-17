@@ -11,19 +11,16 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
 public class UploadImage extends AsyncTask<String, String, Integer> {
 
     int serverResponseCode = 0;
-    ProgressDialog dialog = null;
-    /*@Override
-    public void onCreate(Bundle savedInstanceState) {
-        //super.onCreate(savedInstanceState);
-    }*/
-
+    ProgressDialog dialog;
 
     public Integer doInBackground(String... args) {
         String upLoadServerUri = "http://leash.ly/webservice/upload_to_serv.php";

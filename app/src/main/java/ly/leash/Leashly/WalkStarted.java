@@ -2,14 +2,14 @@ package ly.leash.Leashly;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.Context;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
@@ -30,7 +30,6 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -51,13 +50,20 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
-
-import static ly.leash.Leashly.R.layout.activity_maps;
 
 /**
  * Created by schwallie on 12/7/2014.
@@ -73,6 +79,7 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
     String user = null;
     Button walk_fin;
     ImageButton camera_btn;
+    ProgressDialog dialog;
     // Milliseconds per second
     private static final int MILLISECONDS_PER_SECOND = 1000;
     // Update frequency in seconds
@@ -120,10 +127,10 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
         boolean mUpdatesRequested = true;
         mLocationClient = new LocationClient(this, this, this);
-        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                "MyWakelockTag");
-        wakeLock.acquire();
+        //PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        //wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+        //        "MyWakelockTag");
+        //wakeLock.acquire();
         setUpMapIfNeeded();
     }
 
@@ -138,36 +145,46 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         Log.d("ID",v.getId()+"");
         switch (v.getId()) {
             case R.id.walk_finished_button:
-                wakeLock.release();
+                //wakeLock.release();
+                dialog = ProgressDialog.show(WalkStarted.this, "Uploading",
+                        "Please wait...");
+                try {
+                    CaptureMapScreen();
+                } catch (Exception e) {
+                    // TODO: handle exception
+                    e.printStackTrace();
+                }
+                //dialog.dismiss();
+                /*
                 mMap.snapshot(new GoogleMap.SnapshotReadyCallback() {
                     public void onSnapshotReady(Bitmap bitmap) {
                         // Write image to disk
                         try {
-                            FileOutputStream out = new FileOutputStream("/mnt/sdcard/map.png");
+                            FileOutputStream out = new FileOutputStream(save_loc);
                             bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+                            UploadImageClass uim = new UploadImageClass();
+                            int response = 0;
+                            try {
+                                response = uim.execute(save_loc).get();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            } catch (ExecutionException e) {
+                                e.printStackTrace();
+                            }
+
+                            System.out.println("RES : " + response);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-
+                        dialog.dismiss();
                     }
-                });
-                UploadImage uim = new UploadImage();
-                int response = 0;
-                try {
-                    response= uim.execute("/mnt/sdcard/map.png").get();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
-
-                System.out.println("RES : " + response);
-
-
-                Animation fadeout = AnimationUtils.loadAnimation(this, R.anim.fadeout);
+                });*/
+                /*Animation fadeout = AnimationUtils.loadAnimation(this, R.anim.fadeout);
                 walk_fin.startAnimation(fadeout);
                 Animation fadein = AnimationUtils.loadAnimation(this, R.anim.fadein);
-                camera_btn.startAnimation(fadein);
+                camera_btn.startAnimation(fadein);*/
+                walk_fin.setVisibility(View.INVISIBLE);
+                camera_btn.setVisibility(View.VISIBLE);
 
                 break;
             case R.id.camera_btn:
@@ -175,6 +192,49 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
                 // do stuff;
                 break;
         }
+    }
+
+    public void CaptureMapScreen() {
+        GoogleMap.SnapshotReadyCallback callback = new GoogleMap.SnapshotReadyCallback() {
+            Bitmap bitmap;
+
+            @Override
+            public void onSnapshotReady(Bitmap snapshot) {
+                // TODO Auto-generated method stub
+                bitmap = snapshot;
+                try {
+                    DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+                    Date date = new Date();
+                    String dte = dateFormat.format(date);
+                    Log.d("storage", Environment.getExternalStorageDirectory().toString());
+                    final String save_loc = Environment.getExternalStorageDirectory().toString()+"/map_"+dte+"_userId_"+user+".png";
+                    FileOutputStream out = new FileOutputStream(save_loc);
+
+                    // above "/mnt ..... png" => is a storage path (where image will be stored) + name of image you can customize as per your Requirement
+
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+                    UploadImageClass uim = new UploadImageClass();
+                    int response = 0;
+                    try {
+                        response = uim.execute(save_loc).get();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
+
+                    System.out.println("RES : " + response);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        mMap.snapshot(callback);
+
+        // myMap is object of GoogleMap +> GoogleMap myMap;
+        // which is initialized in onCreate() =>
+        // myMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_pass_home_call)).getMap();
     }
 
     @Override
@@ -354,6 +414,8 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
             return mDialog;
         }
     }
+
+
     public class MapPosition extends AsyncTask<String, String, String> {
 
 
@@ -416,6 +478,132 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         }
     }
 
+    public class UploadImageClass extends AsyncTask<String, String, Integer> {
+
+        int serverResponseCode = 0;
+        /*@Override
+        protected void onPreExecute()
+        {
+
+            dialog= new ProgressDialog(WalkStarted.this);
+            dialog.setIndeterminate(true);
+            dialog.setCancelable(false);
+            dialog.setMessage("Downloading! Please wait...!");
+            dialog.show();
+
+        }*/
+        public Integer doInBackground(String... args) {
+            String upLoadServerUri = "http://leash.ly/webservice/upload_to_serv.php";
+            final String fileName = args[0];
+
+            mMap.snapshot(new GoogleMap.SnapshotReadyCallback() {
+                public void onSnapshotReady(Bitmap bitmap) {
+                    // Write image to disk
+                    try {
+                        FileOutputStream out = new FileOutputStream(fileName);
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+                        /*UploadImageClass uim = new UploadImageClass();
+                        int response = 0;
+                        try {
+                            response = uim.execute(fileName).get();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                        }
+
+                        System.out.println("RES : " + response);*/
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    //dialog.dismiss();
+                }
+            });
+
+
+            HttpURLConnection conn = null;
+            DataOutputStream dos = null;
+            String lineEnd = "\r\n";
+            String twoHyphens = "--";
+            String boundary = "*****";
+            int bytesRead, bytesAvailable, bufferSize;
+            byte[] buffer;
+            int maxBufferSize = 1 * 1024 * 1024;
+            File sourceFile = new File(args[0]);
+            if (!sourceFile.isFile()) {
+                Log.e("uploadFile", "Source File Does not exist");
+                return 0;
+            }
+            try { // open a URL connection to the Servlet
+                FileInputStream fileInputStream = new FileInputStream(sourceFile);
+                URL url = new URL(upLoadServerUri);
+                conn = (HttpURLConnection) url.openConnection(); // Open a HTTP  connection to  the URL
+                conn.setDoInput(true); // Allow Inputs
+                conn.setDoOutput(true); // Allow Outputs
+                conn.setUseCaches(false); // Don't use a Cached Copy
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Connection", "Keep-Alive");
+                conn.setRequestProperty("ENCTYPE", "multipart/form-data");
+                conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+                conn.setRequestProperty("uploaded_file", fileName);
+                dos = new DataOutputStream(conn.getOutputStream());
+
+                dos.writeBytes(twoHyphens + boundary + lineEnd);
+                dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";filename=\""+ fileName + "\"" + lineEnd);
+                dos.writeBytes(lineEnd);
+
+                bytesAvailable = fileInputStream.available(); // create a buffer of  maximum size
+
+                bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                buffer = new byte[bufferSize];
+
+                // read file and write it into form...
+                bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+
+                while (bytesRead > 0) {
+                    dos.write(buffer, 0, bufferSize);
+                    bytesAvailable = fileInputStream.available();
+                    bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                    bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+                }
+
+                // send multipart form data necesssary after file data...
+                dos.writeBytes(lineEnd);
+                dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+
+                // Responses from the server (code and message)
+                serverResponseCode = conn.getResponseCode();
+                String serverResponseMessage = conn.getResponseMessage();
+
+                Log.i("uploadFile", "HTTP Response is : " + serverResponseMessage + ": " + serverResponseCode);
+                //close the streams //
+                fileInputStream.close();
+                dos.flush();
+                dos.close();
+
+            } catch (MalformedURLException ex) {
+                //dialog.dismiss();
+                ex.printStackTrace();
+                //Toast.makeText(UploadImage.this, "MalformedURLException", Toast.LENGTH_SHORT).show();
+                Log.e("Upload file to server", "error: " + ex.getMessage(), ex);
+            } catch (Exception e) {
+                //dialog.dismiss();
+                e.printStackTrace();
+                //Toast.makeText(UploadImage.this, "Exception : " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("Upload file to server Exception", "Exception : " + e.getMessage(), e);
+            }
+            //dialog.dismiss();
+            return serverResponseCode;
+        }
+        @Override
+        protected void onPostExecute(Integer result)
+        {
+            super.onPostExecute(result);
+            Log.i("result","" +result);
+            if(result!=null)
+                dialog.dismiss();
+        }
+    }
 }
 
 
