@@ -41,6 +41,8 @@
     <string name="new_walk">New Walk!</string>
     <string name="request_button">Request</string>
     <string name="walk_finished">Walk Finished!</string>
+    <string name="cannot">Cannot</string>
+    <string name="album_name">CameraSample</string>
     <string-array name="cities_array">
         <item>Select City</item>
         <item>Chicago</item>

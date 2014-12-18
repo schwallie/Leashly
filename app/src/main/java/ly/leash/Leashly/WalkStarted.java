@@ -65,9 +65,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
-/**
- * Created by schwallie on 12/7/2014.
- */
 public class WalkStarted extends ActionBarActivity implements View.OnClickListener,
         GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener,
@@ -96,7 +93,7 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
     LocationRequest mLocationRequest;
     LocationClient mLocationClient;
     LatLng prev_latlng;
-    PowerManager.WakeLock wakeLock;
+    //PowerManager.WakeLock wakeLock;
     static final int REQUEST_IMAGE_CAPTURE = 1;
     DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
     Date date = new Date();
@@ -129,7 +126,7 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         mLocationRequest.setInterval(UPDATE_INTERVAL);
         // Set the fastest update interval to 1 second
         mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
-        boolean mUpdatesRequested = true;
+        //boolean mUpdatesRequested = true;
         mLocationClient = new LocationClient(this, this, this);
         //PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
         //wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
@@ -138,12 +135,12 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         setUpMapIfNeeded();
     }
 
-    private void dispatchTakePictureIntent() {
+    /*private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
-    }
+    }*/
 
     @Override
     public void onClick(View v) {
@@ -163,41 +160,19 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
                 }
                 //Log.d("At dismiss", "");
                 //dialog.dismiss();
-                /*
-                mMap.snapshot(new GoogleMap.SnapshotReadyCallback() {
-                    public void onSnapshotReady(Bitmap bitmap) {
-                        // Write image to disk
-                        try {
-                            FileOutputStream out = new FileOutputStream(save_loc);
-                            bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
-                            UploadImageClass uim = new UploadImageClass();
-                            int response = 0;
-                            try {
-                                response = uim.execute(save_loc).get();
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            } catch (ExecutionException e) {
-                                e.printStackTrace();
-                            }
 
-                            System.out.println("RES : " + response);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        dialog.dismiss();
-                    }
-                });*/
-                /*Animation fadeout = AnimationUtils.loadAnimation(this, R.anim.fadeout);
+                Animation fadeout = AnimationUtils.loadAnimation(this, R.anim.fadeout);
                 walk_fin.startAnimation(fadeout);
                 Animation fadein = AnimationUtils.loadAnimation(this, R.anim.fadein);
-                camera_btn.startAnimation(fadein);*/
+                camera_btn.startAnimation(fadein);
                 walk_fin.setVisibility(View.INVISIBLE);
                 camera_btn.setVisibility(View.VISIBLE);
 
                 break;
             case R.id.camera_btn:
-                dispatchTakePictureIntent();
+                //dispatchTakePictureIntent();
                 // do stuff;
+
                 break;
         }
     }
@@ -245,7 +220,7 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
      */
 
     private void setUpMap() {
-        Bundle extras = getIntent().getExtras();
+        //Bundle extras = getIntent().getExtras();
         String data = null;
         try {
             data = new MapPosition().execute(user).get();
@@ -287,7 +262,7 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         // Report to the UI that the location was
         double lat = location.getLatitude();
         double longitude = location.getLongitude();
-        Polyline line = mMap.addPolyline(new PolylineOptions()
+        mMap.addPolyline(new PolylineOptions()
                 .add(new LatLng(lat, longitude), prev_latlng)
                 .width(30)
                 .color(R.color.primaryColor));
