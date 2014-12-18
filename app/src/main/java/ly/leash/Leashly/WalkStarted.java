@@ -71,8 +71,7 @@ import java.util.concurrent.ExecutionException;
 public class WalkStarted extends ActionBarActivity implements View.OnClickListener,
         GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener,
-        LocationListener
-{
+        LocationListener {
 
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -99,6 +98,11 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
     LatLng prev_latlng;
     PowerManager.WakeLock wakeLock;
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+    Date date = new Date();
+    String dte = dateFormat.format(date);
+    final String save_loc = Environment.getExternalStorageDirectory().toString() + "/map_" + dte + "_userId_" + user + ".png";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,7 +115,7 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             user = extras.getString("user");
-            Log.d("ID", user+"");
+            Log.d("ID", user + "");
         }
         walk_fin = (Button) findViewById(R.id.walk_finished_button);
         camera_btn = (ImageButton) findViewById(R.id.camera_btn);
@@ -140,20 +144,24 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
     }
+
     @Override
     public void onClick(View v) {
-        Log.d("ID",v.getId()+"");
+        Log.d("ID", v.getId() + "");
         switch (v.getId()) {
             case R.id.walk_finished_button:
                 //wakeLock.release();
                 dialog = ProgressDialog.show(WalkStarted.this, "Uploading",
                         "Please wait...");
+
                 try {
-                    CaptureMapScreen();
+                    new CaptureMapScreen().execute();
+
                 } catch (Exception e) {
                     // TODO: handle exception
                     e.printStackTrace();
                 }
+                //Log.d("At dismiss", "");
                 //dialog.dismiss();
                 /*
                 mMap.snapshot(new GoogleMap.SnapshotReadyCallback() {
@@ -194,70 +202,28 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         }
     }
 
-    public void CaptureMapScreen() {
-        GoogleMap.SnapshotReadyCallback callback = new GoogleMap.SnapshotReadyCallback() {
-            Bitmap bitmap;
-
-            @Override
-            public void onSnapshotReady(Bitmap snapshot) {
-                // TODO Auto-generated method stub
-                bitmap = snapshot;
-                try {
-                    DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
-                    Date date = new Date();
-                    String dte = dateFormat.format(date);
-                    Log.d("storage", Environment.getExternalStorageDirectory().toString());
-                    final String save_loc = Environment.getExternalStorageDirectory().toString()+"/map_"+dte+"_userId_"+user+".png";
-                    FileOutputStream out = new FileOutputStream(save_loc);
-
-                    // above "/mnt ..... png" => is a storage path (where image will be stored) + name of image you can customize as per your Requirement
-
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
-                    UploadImageClass uim = new UploadImageClass();
-                    int response = 0;
-                    try {
-                        response = uim.execute(save_loc).get();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } catch (ExecutionException e) {
-                        e.printStackTrace();
-                    }
-
-                    System.out.println("RES : " + response);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-
-        mMap.snapshot(callback);
-
-        // myMap is object of GoogleMap +> GoogleMap myMap;
-        // which is initialized in onCreate() =>
-        // myMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_pass_home_call)).getMap();
-    }
 
     @Override
     protected void onResume() {
-            super.onResume();
-            setUpMapIfNeeded();
-        }
+        super.onResume();
+        setUpMapIfNeeded();
+    }
 
-        /**
-         * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
-         * installed) and the map has not already been instantiated.. This will ensure that we only ever
-         * call {@link #setUpMap()} once when {@link #mMap} is not null.
-         * <p/>
-         * If it isn't installed {@link com.google.android.gms.maps.SupportMapFragment} (and
-         * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
-         * install/update the Google Play services APK on their device.
-         * <p/>
-         * A user can return to this FragmentActivity after following the prompt and correctly
-         * installing/updating/enabling the Google Play services. Since the FragmentActivity may not
-         * have been completely destroyed during this process (it is likely that it would only be
-         * stopped or paused), {@link #onCreate(android.os.Bundle)} may not be called again so we should call this
-         * method in {@link #onResume()} to guarantee that it will be called.
-         */
+    /**
+     * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
+     * installed) and the map has not already been instantiated.. This will ensure that we only ever
+     * call {@link #setUpMap()} once when {@link #mMap} is not null.
+     * <p/>
+     * If it isn't installed {@link com.google.android.gms.maps.SupportMapFragment} (and
+     * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
+     * install/update the Google Play services APK on their device.
+     * <p/>
+     * A user can return to this FragmentActivity after following the prompt and correctly
+     * installing/updating/enabling the Google Play services. Since the FragmentActivity may not
+     * have been completely destroyed during this process (it is likely that it would only be
+     * stopped or paused), {@link #onCreate(android.os.Bundle)} may not be called again so we should call this
+     * method in {@link #onResume()} to guarantee that it will be called.
+     */
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
@@ -288,14 +254,14 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-        Log.d("data", data+"");
+        Log.d("data", data + "");
         double lat, longitude;
-        try{
+        try {
             JSONObject jobj = new JSONObject(data);
             lat = jobj.getDouble("lat");
             longitude = jobj.getDouble("long");
 
-        } catch(JSONException e){
+        } catch (JSONException e) {
             lat = 0.0;
             longitude = 0.0;
             e.printStackTrace();
@@ -315,6 +281,7 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
     }
+
     @Override
     public void onLocationChanged(Location location) {
         // Report to the UI that the location was
@@ -332,6 +299,7 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         super.onStart();
         mLocationClient.connect();
     }
+
     @Override
     public void onConnected(Bundle dataBundle) {
         // Display the connection status
@@ -340,12 +308,14 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         mLocationClient.requestLocationUpdates(mLocationRequest, this);
 
     }
+
     @Override
     public void onDisconnected() {
         // Display the connection status
         Toast.makeText(this, "Disconnected. Please re-connect.",
                 Toast.LENGTH_SHORT).show();
     }
+
     @Override
     protected void onStop() {
         // If the client is connected
@@ -396,18 +366,22 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         }
 
     }
+
     public static class ErrorDialogFragment extends DialogFragment {
         // Global field to contain the error dialog
         private Dialog mDialog;
+
         // Default constructor. Sets the dialog field to null
         public ErrorDialogFragment() {
             super();
             mDialog = null;
         }
+
         // Set the dialog to display
         public void setDialog(Dialog dialog) {
             mDialog = dialog;
         }
+
         // Return a Dialog to the DialogFragment.
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -415,6 +389,51 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         }
     }
 
+
+    public class CaptureMapScreen extends AsyncTask<Void, Void, String> {
+
+        @Override
+        protected String doInBackground(Void... params) {
+            GoogleMap.SnapshotReadyCallback callback = new GoogleMap.SnapshotReadyCallback() {
+                Bitmap bitmap;
+
+                @Override
+                public void onSnapshotReady(Bitmap snapshot) {
+                    // TODO Auto-generated method stub
+                    bitmap = snapshot;
+                    try {
+                        Log.d("storage", Environment.getExternalStorageDirectory().toString());
+                        FileOutputStream out = new FileOutputStream(save_loc);
+
+                        // above "/mnt ..... png" => is a storage path (where image will be stored) + name of image you can customize as per your Requirement
+
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+                        UploadImageClass uim = new UploadImageClass();
+                        int response = 0;
+                        try {
+                            response = uim.execute(save_loc).get();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                        }
+
+                        System.out.println("RES : " + response);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+
+            mMap.snapshot(callback);
+            return null;
+        }
+
+
+        // myMap is object of GoogleMap +> GoogleMap myMap;
+        // which is initialized in onCreate() =>
+        // myMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_pass_home_call)).getMap();
+    }
 
     public class MapPosition extends AsyncTask<String, String, String> {
 
@@ -601,6 +620,7 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
             super.onPostExecute(result);
             Log.i("result","" +result);
             if(result!=null)
+                Log.d("At dismiss2", "");
                 dialog.dismiss();
         }
     }
