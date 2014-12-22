@@ -1,16 +1,14 @@
 package ly.leash.Leashly;
 
-import android.app.Dialog;
-import android.app.DialogFragment;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,13 +18,12 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
-import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -34,7 +31,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.apache.http.HttpEntity;
@@ -66,39 +62,68 @@ import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
 public class WalkStarted extends ActionBarActivity implements View.OnClickListener,
-        GooglePlayServicesClient.ConnectionCallbacks,
-        GooglePlayServicesClient.OnConnectionFailedListener,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
 
 
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    public static final int MEDIA_TYPE_IMAGE = 1;
     String user = null;
     Button walk_fin;
     ImageButton camera_btn;
     ProgressDialog dialog;
-    // Milliseconds per second
-    private static final int MILLISECONDS_PER_SECOND = 1000;
-    // Update frequency in seconds
-    public static final int UPDATE_INTERVAL_IN_SECONDS = 45;
-    // Update frequency in milliseconds
-    private static final long UPDATE_INTERVAL =
-            MILLISECONDS_PER_SECOND * UPDATE_INTERVAL_IN_SECONDS;
-    // The fastest update frequency, in seconds
-    private static final int FASTEST_INTERVAL_IN_SECONDS = 45;
-    // A fast frequency ceiling in milliseconds
-    private static final long FASTEST_INTERVAL =
-            MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;
-    private final static int
-            CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     LocationRequest mLocationRequest;
-    LocationClient mLocationClient;
+    GoogleApiClient mLocationClient;
     LatLng prev_latlng;
-    //PowerManager.WakeLock wakeLock;
-    static final int REQUEST_IMAGE_CAPTURE = 1;
-    DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+    DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
     Date date = new Date();
     String dte = dateFormat.format(date);
-    final String save_loc = Environment.getExternalStorageDirectory().toString() + "/map_" + dte + "_userId_" + user + ".png";
+    int REQUEST_IMAGE = 1;
+    String save_loc = null;
+    Integer camera_done = 0;
+    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private Uri fileUri;
+
+    /**
+     * Create a file Uri for saving an image or video
+     */
+    private static Uri getOutputMediaFileUri(int type) {
+        return Uri.fromFile(getOutputMediaFile(type));
+    }
+
+    /**
+     * Create a File for saving an image or video
+     */
+    private static File getOutputMediaFile(int type) {
+        // To be safe, you should check that the SDCard is mounted
+        // using Environment.getExternalStorageState() before doing this.
+
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "Leashly");
+        // This location works best if you want the created images to be shared
+        // between applications and persist after your app has been uninstalled.
+
+        // Create the storage directory if it does not exist
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                Log.d("Leashly", "failed to create directory");
+                return null;
+            }
+        }
+
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File mediaFile;
+        if (type == MEDIA_TYPE_IMAGE) {
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                    "IMG_" + timeStamp + ".jpg");
+            Log.d("mediaDir", mediaFile.toString());
+        } else {
+            return null;
+        }
+
+        return mediaFile;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,20 +139,16 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
             user = extras.getString("user");
             Log.d("ID", user + "");
         }
+        save_loc = Environment.getExternalStorageDirectory().toString() + "/MAP_" + dte + "_userId_" + user + ".png";
         walk_fin = (Button) findViewById(R.id.walk_finished_button);
         camera_btn = (ImageButton) findViewById(R.id.camera_btn);
         walk_fin.setOnClickListener(this);
         camera_btn.setOnClickListener(this);
-        mLocationRequest = LocationRequest.create();
-        // Use high accuracy
-        mLocationRequest.setPriority(
-                LocationRequest.PRIORITY_HIGH_ACCURACY);
-        // Set the update interval to 5 seconds
-        mLocationRequest.setInterval(UPDATE_INTERVAL);
-        // Set the fastest update interval to 1 second
-        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
-        //boolean mUpdatesRequested = true;
-        mLocationClient = new LocationClient(this, this, this);
+        mLocationClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
         //PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
         //wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
         //        "MyWakelockTag");
@@ -135,48 +156,41 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         setUpMapIfNeeded();
     }
 
-    /*private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-        }
-    }*/
-
     @Override
     public void onClick(View v) {
         Log.d("ID", v.getId() + "");
         switch (v.getId()) {
             case R.id.walk_finished_button:
                 //wakeLock.release();
-                dialog = ProgressDialog.show(WalkStarted.this, "Uploading",
-                        "Please wait...");
+                //dialog = ProgressDialog.show(WalkStarted.this, "Uploading",
+                //      "Please wait...");
+                LocationServices.FusedLocationApi.removeLocationUpdates(mLocationClient, this);
+                new CaptureMapScreen().execute();
 
-                try {
-                    new CaptureMapScreen().execute();
-
-                } catch (Exception e) {
-                    // TODO: handle exception
-                    e.printStackTrace();
-                }
                 //Log.d("At dismiss", "");
                 //dialog.dismiss();
 
-                Animation fadeout = AnimationUtils.loadAnimation(this, R.anim.fadeout);
-                walk_fin.startAnimation(fadeout);
-                Animation fadein = AnimationUtils.loadAnimation(this, R.anim.fadein);
-                camera_btn.startAnimation(fadein);
-                walk_fin.setVisibility(View.INVISIBLE);
-                camera_btn.setVisibility(View.VISIBLE);
-
                 break;
             case R.id.camera_btn:
-                //dispatchTakePictureIntent();
+                dispatchTakePictureIntent();
+                walk_fin.setVisibility(View.INVISIBLE);
+                camera_btn.setVisibility(View.VISIBLE);
                 // do stuff;
 
                 break;
         }
     }
 
+    protected void dispatchTakePictureIntent() {
+        // create Intent to take a picture and return control to the calling application
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // create a file to save the image
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file name
+
+        // start the image capture Intent
+        startActivityForResult(intent, REQUEST_IMAGE);
+    }
 
     @Override
     protected void onResume() {
@@ -184,21 +198,6 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         setUpMapIfNeeded();
     }
 
-    /**
-     * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
-     * installed) and the map has not already been instantiated.. This will ensure that we only ever
-     * call {@link #setUpMap()} once when {@link #mMap} is not null.
-     * <p/>
-     * If it isn't installed {@link com.google.android.gms.maps.SupportMapFragment} (and
-     * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
-     * install/update the Google Play services APK on their device.
-     * <p/>
-     * A user can return to this FragmentActivity after following the prompt and correctly
-     * installing/updating/enabling the Google Play services. Since the FragmentActivity may not
-     * have been completely destroyed during this process (it is likely that it would only be
-     * stopped or paused), {@link #onCreate(android.os.Bundle)} may not be called again so we should call this
-     * method in {@link #onResume()} to guarantee that it will be called.
-     */
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
@@ -257,6 +256,33 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
 
     }
 
+    private void finishActivity() {
+        if (camera_done == 1) {
+            //Finish up
+            POST2GCM.post(user, "WalkDone");
+        }
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE && resultCode == Activity.RESULT_OK) {
+            // Image captured and saved to fileUri specified in the Intent
+            Log.d("requestCode", requestCode + "");
+            String loc_of_image = fileUri.getPath();
+            Log.d("Image_Loc", loc_of_image);
+            try {
+                UploadToServer uts;
+                uts = new UploadToServer();
+                uts.execute(loc_of_image);
+                camera_done = 1;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            Log.d("Image capture failed", "fail");
+            // Image capture failed, advise user
+        }
+    }
+
     @Override
     public void onLocationChanged(Location location) {
         // Report to the UI that the location was
@@ -272,100 +298,53 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
     @Override
     protected void onStart() {
         super.onStart();
+        // Connect the client.
         mLocationClient.connect();
     }
 
     @Override
-    public void onConnected(Bundle dataBundle) {
-        // Display the connection status
-        Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
-        // If already requested, start periodic updates
-        mLocationClient.requestLocationUpdates(mLocationRequest, this);
-
-    }
-
-    @Override
-    public void onDisconnected() {
-        // Display the connection status
-        Toast.makeText(this, "Disconnected. Please re-connect.",
-                Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
     protected void onStop() {
-        // If the client is connected
-        if (mLocationClient.isConnected()) {
-            /*
-             * Remove location updates for a listener.
-             * The current Activity is the listener, so
-             * the argument is "this".
-             */
-            mLocationClient.removeLocationUpdates(this);
-        }
-        /*
-         * After disconnect() is called, the client is
-         * considered "dead".
-         */
+        // Disconnecting the client invalidates it.
         mLocationClient.disconnect();
         super.onStop();
     }
 
     @Override
+    public void onConnected(Bundle bundle) {
+
+        mLocationRequest = LocationRequest.create();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(10000);
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mLocationClient, mLocationRequest, this);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.i("WalkStarted", "GoogleApiClient connection has been suspend");
+    }
+
+    @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        /*
-         * Google Play services can resolve some errors it detects.
-         * If the error has a resolution, try sending an Intent to
-         * start a Google Play services activity that can resolve
-         * error.
-         */
-        if (connectionResult.hasResolution()) {
-            try {
-                // Start an Activity that tries to resolve the error
-                connectionResult.startResolutionForResult(
-                        this,
-                        CONNECTION_FAILURE_RESOLUTION_REQUEST);
-                /*
-                * Thrown if Google Play services canceled the original
-                * PendingIntent
-                */
-            } catch (IntentSender.SendIntentException e) {
-                // Log the error
-                e.printStackTrace();
-            }
-        } else {
-            /*
-             * If no resolution is available, display a dialog to the
-             * user with the error.
-             */
-            //showErrorDialog(connectionResult.getErrorCode());
-        }
-
+        Log.i("walkstarted", "GoogleApiClient connection has failed");
     }
-
-    public static class ErrorDialogFragment extends DialogFragment {
-        // Global field to contain the error dialog
-        private Dialog mDialog;
-
-        // Default constructor. Sets the dialog field to null
-        public ErrorDialogFragment() {
-            super();
-            mDialog = null;
-        }
-
-        // Set the dialog to display
-        public void setDialog(Dialog dialog) {
-            mDialog = dialog;
-        }
-
-        // Return a Dialog to the DialogFragment.
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            return mDialog;
-        }
-    }
-
 
     public class CaptureMapScreen extends AsyncTask<Void, Void, String> {
+
+        @Override
+        protected void onPreExecute() {
+            Log.d("pre", "pre-execute");
+            dialog = ProgressDialog.show(WalkStarted.this, "Uploading",
+                    "Please wait...");
+
+        }
+
+        @Override
+        protected void onPostExecute(String args) {
+            Log.d("post", "post-execute2");
+
+        }
 
         @Override
         protected String doInBackground(Void... params) {
@@ -379,21 +358,10 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
                     try {
                         Log.d("storage", Environment.getExternalStorageDirectory().toString());
                         FileOutputStream out = new FileOutputStream(save_loc);
-
-                        // above "/mnt ..... png" => is a storage path (where image will be stored) + name of image you can customize as per your Requirement
-
                         bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
-                        UploadImageClass uim = new UploadImageClass();
-                        int response = 0;
-                        try {
-                            response = uim.execute(save_loc).get();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        } catch (ExecutionException e) {
-                            e.printStackTrace();
-                        }
-
-                        System.out.println("RES : " + response);
+                        UploadImageClass uim;
+                        uim = new UploadImageClass();
+                        uim.execute(save_loc);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -403,38 +371,31 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
             mMap.snapshot(callback);
             return null;
         }
-
-
-        // myMap is object of GoogleMap +> GoogleMap myMap;
-        // which is initialized in onCreate() =>
-        // myMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_pass_home_call)).getMap();
     }
 
     public class MapPosition extends AsyncTask<String, String, String> {
-
-
         @Override
         protected String doInBackground(String... args) {
             String user = args[0];
             String result = "";
             InputStream is = null;
-            ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+            ArrayList<NameValuePair> nameValuePairs = new ArrayList<>();
             nameValuePairs.add(new BasicNameValuePair("user", user));
 
 //http post
-            try{
+            try {
                 HttpClient httpclient = new DefaultHttpClient();
                 HttpPost httppost = new HttpPost("http://leash.ly/webservice/get_data_id.php");
                 httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
                 HttpResponse response = httpclient.execute(httppost);
                 HttpEntity entity = response.getEntity();
                 is = entity.getContent();
-            }catch(Exception e){
-                Log.e("log_tag", "Error in http connection "+e.toString());
+            } catch (Exception e) {
+                Log.e("log_tag", "Error in http connection " + e.toString());
             }
 //convert response to string
-            try{
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is,"iso-8859-1"),8);
+            try {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
                 StringBuilder sb = new StringBuilder();
                 String line = null;
                 while ((line = reader.readLine()) != null) {
@@ -442,30 +403,27 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
                 }
                 is.close();
 
-                result=sb.toString();
-            }catch(Exception e){
-                Log.e("log_tag", "Error converting result "+e.toString());
+                result = sb.toString();
+            } catch (Exception e) {
+                Log.e("log_tag", "Error converting result " + e.toString());
             }
 
 //parse json data
-            try{
+            try {
                 JSONArray jArray = new JSONArray(result);
                 JSONObject json_data = null;
-                for(int i=0;i<jArray.length();i++){
+                for (int i = 0; i < jArray.length(); i++) {
                     json_data = jArray.getJSONObject(i);
-                    Log.i("log_tag","id: "+json_data.getInt("id")+
-                                    ", name: "+json_data.getString("first_name")+
-                                    ", address_1: "+json_data.getString("address_1")+
-                                    ", address_2: "+json_data.getString("address_2")
+                    Log.i("log_tag", "id: " + json_data.getInt("id") +
+                                    ", name: " + json_data.getString("first_name") +
+                                    ", address_1: " + json_data.getString("address_1") +
+                                    ", address_2: " + json_data.getString("address_2")
                     );
                 }
                 return json_data.toString();
+            } catch (JSONException e) {
+                Log.e("log_tag", "Error parsing data " + e.toString());
             }
-            catch(JSONException e){
-                Log.e("log_tag", "Error parsing data "+e.toString());
-            }
-
-
 
 
             return null;
@@ -475,46 +433,56 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
     public class UploadImageClass extends AsyncTask<String, String, Integer> {
 
         int serverResponseCode = 0;
-        /*@Override
-        protected void onPreExecute()
-        {
 
-            dialog= new ProgressDialog(WalkStarted.this);
-            dialog.setIndeterminate(true);
-            dialog.setCancelable(false);
-            dialog.setMessage("Downloading! Please wait...!");
-            dialog.show();
-
-        }*/
         public Integer doInBackground(String... args) {
-            String upLoadServerUri = "http://leash.ly/webservice/upload_to_serv.php";
             final String fileName = args[0];
-
+            Log.d("fileName", fileName);
             mMap.snapshot(new GoogleMap.SnapshotReadyCallback() {
                 public void onSnapshotReady(Bitmap bitmap) {
                     // Write image to disk
                     try {
                         FileOutputStream out = new FileOutputStream(fileName);
                         bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
-                        /*UploadImageClass uim = new UploadImageClass();
-                        int response = 0;
-                        try {
-                            response = uim.execute(fileName).get();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        } catch (ExecutionException e) {
-                            e.printStackTrace();
-                        }
-
-                        System.out.println("RES : " + response);*/
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    new UploadToServer().execute(fileName);
                     //dialog.dismiss();
                 }
             });
+            return null;
+        }
 
+        @Override
+        protected void onPostExecute(Integer result) {
+            super.onPostExecute(result);
+            Log.i("result", "" + result);
+            Log.d("At dismiss2", "");
+            dialog.dismiss();
+            if (walk_fin.getVisibility() == walk_fin.VISIBLE) {
+                Animation fadeout = AnimationUtils.loadAnimation(WalkStarted.this, R.anim.fadeout);
+                walk_fin.startAnimation(fadeout);
+                Animation fadein = AnimationUtils.loadAnimation(WalkStarted.this, R.anim.fadein);
+                camera_btn.startAnimation(fadein);
+                walk_fin.setVisibility(View.INVISIBLE);
+                camera_btn.setVisibility(View.VISIBLE);
+            }
+        }
 
+    }
+
+    public class UploadToServer extends AsyncTask<String, String, Integer> {
+
+        String upLoadServerUri = "http://leash.ly/webservice/upload_to_serv.php";
+        int serverResponseCode = 0;
+
+        @Override
+        public void onPostExecute(Integer serverResponse) {
+            finishActivity();
+        }
+
+        public Integer doInBackground(String... args) {
+            String fileName = args[0];
             HttpURLConnection conn = null;
             DataOutputStream dos = null;
             String lineEnd = "\r\n";
@@ -524,10 +492,10 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
             byte[] buffer;
             int maxBufferSize = 1 * 1024 * 1024;
             File sourceFile = new File(args[0]);
-            if (!sourceFile.isFile()) {
-                Log.e("uploadFile", "Source File Does not exist");
-                return 0;
+            while (sourceFile.exists() != true) {
+                System.out.println("WAITING...");
             }
+
             try { // open a URL connection to the Servlet
                 FileInputStream fileInputStream = new FileInputStream(sourceFile);
                 URL url = new URL(upLoadServerUri);
@@ -543,7 +511,7 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
                 dos = new DataOutputStream(conn.getOutputStream());
 
                 dos.writeBytes(twoHyphens + boundary + lineEnd);
-                dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";filename=\""+ fileName + "\"" + lineEnd);
+                dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";filename=\"" + fileName + "\"" + lineEnd);
                 dos.writeBytes(lineEnd);
 
                 bytesAvailable = fileInputStream.available(); // create a buffer of  maximum size
@@ -574,7 +542,6 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
                 fileInputStream.close();
                 dos.flush();
                 dos.close();
-
             } catch (MalformedURLException ex) {
                 //dialog.dismiss();
                 ex.printStackTrace();
@@ -589,17 +556,5 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
             //dialog.dismiss();
             return serverResponseCode;
         }
-        @Override
-        protected void onPostExecute(Integer result)
-        {
-            super.onPostExecute(result);
-            Log.i("result","" +result);
-            if(result!=null)
-                Log.d("At dismiss2", "");
-                dialog.dismiss();
-        }
     }
 }
-
-
-

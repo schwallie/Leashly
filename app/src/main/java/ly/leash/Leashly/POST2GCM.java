@@ -29,6 +29,12 @@ import java.util.List;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class POST2GCM {
 
+    public static void post(String regId, String msg_title){
+        PostAsync task_ = new PostAsync();
+        task_.execute(regId, msg_title);
+
+    }
+
     public static class PostAsync extends AsyncTask<String, Void, Void> {
         @Override
         protected Void doInBackground(String... params) {
@@ -55,11 +61,10 @@ public class POST2GCM {
                 String gcm_id = null;
                 try {
                     JSONArray innerProjectArray = json_obj.getJSONArray("result");
-                    for (int i = 0; i < innerProjectArray.length(); i++)
-                    {
+                    for (int i = 0; i < innerProjectArray.length(); i++) {
 
-                        JSONObject obj=innerProjectArray.getJSONObject(i);
-                        gcm_id=obj.getString("GCM_ID");
+                        JSONObject obj = innerProjectArray.getJSONObject(i);
+                        gcm_id = obj.getString("GCM_ID");
                     }
                     //gcm_id = json_obj.getString("GCM_ID");
                 } catch (JSONException e) {
@@ -67,10 +72,12 @@ public class POST2GCM {
                 }
                 content.addRegId(gcm_id);
                 String title = params[1];
-                if(title.equals("NewWalk")) {
+                if (title.equals("NewWalk")) {
                     content.createData("New Walk!", "You have a new walk waiting for you!", params[0]);
-                } else if(title.equals("AcceptWalk")) {
+                } else if (title.equals("AcceptWalk")) {
                     content.createData("Walker Accepted", "Your walker is on the way!", params[0]);
+                } else if (title.equals("WalkDone")) {
+                    content.createData("Walk Done", "Click here for details", params[0]);
                 }
                 // 1. URL
                 URL url = new URL("https://android.googleapis.com/gcm/send");
@@ -126,12 +133,5 @@ public class POST2GCM {
             }
             return null;
         }
-    }
-
-
-    public static void post(String regId, String msg_title){
-        PostAsync task_ = new PostAsync();
-        task_.execute(regId, msg_title);
-
     }
 }

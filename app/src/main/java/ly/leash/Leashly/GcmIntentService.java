@@ -1,7 +1,5 @@
 package ly.leash.Leashly;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -12,8 +10,7 @@ import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 /**
  * This {@code IntentService} does the actual handling of the GCM message.
@@ -24,13 +21,15 @@ import org.json.JSONObject;
  */
 public class GcmIntentService extends IntentService {
     public static final int NOTIFICATION_ID = 1;
-    private NotificationManager mNotificationManager;
+    public static final String TAG = "GCM";
+    public String cont;
+    public String title;
+    public String user_id;
     NotificationCompat.Builder builder;
-
+    private NotificationManager mNotificationManager;
     public GcmIntentService() {
         super("GcmIntentService");
     }
-    public static final String TAG = "GCM Demo";
 
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -61,9 +60,9 @@ public class GcmIntentService extends IntentService {
                     } catch (InterruptedException e) {
                     }
                 }
-                String cont = intent.getExtras().getString("message");
-                String title = intent.getExtras().getString("title");
-                String user_id = intent.getExtras().getString("id");
+                cont = intent.getExtras().getString("message");
+                title = intent.getExtras().getString("title");
+                user_id = intent.getExtras().getString("id");
                 Log.i(TAG, "Completed work @ " + SystemClock.elapsedRealtime());
                 // Post notification of received message.
                 sendNotification(user_id, cont, title);
@@ -85,7 +84,14 @@ public class GcmIntentService extends IntentService {
         Log.d("msg",msg);
 
         int requestID = (int) System.currentTimeMillis();
-        Intent notificationIntent = new Intent(this, WalkerRequest.class);
+        Intent notificationIntent;
+        if (title.contains("New")) {
+            notificationIntent = new Intent(this, WalkerRequest.class);
+        } else if (title.contains("Accepted")) {
+            notificationIntent = new Intent(this, WalkInProgress.class);
+        } else {
+            notificationIntent = new Intent(this, WalkDone.class);
+        }
         notificationIntent.putExtra("id", msg);
         PendingIntent contentIntent = PendingIntent.getActivity(this, requestID, notificationIntent, PendingIntent.FLAG_ONE_SHOT);
 
