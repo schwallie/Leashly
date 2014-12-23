@@ -25,8 +25,10 @@ public class GcmIntentService extends IntentService {
     public String cont;
     public String title;
     public String user_id;
+    public String sender_id;
     NotificationCompat.Builder builder;
     private NotificationManager mNotificationManager;
+
     public GcmIntentService() {
         super("GcmIntentService");
     }
@@ -58,11 +60,13 @@ public class GcmIntentService extends IntentService {
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }
                 cont = intent.getExtras().getString("message");
                 title = intent.getExtras().getString("title");
                 user_id = intent.getExtras().getString("id");
+                sender_id = intent.getExtras().getString("sender_id");
                 Log.i(TAG, "Completed work @ " + SystemClock.elapsedRealtime());
                 // Post notification of received message.
                 sendNotification(user_id, cont, title);
@@ -81,7 +85,7 @@ public class GcmIntentService extends IntentService {
         mNotificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         //        this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        Log.d("msg",msg);
+        Log.d("msg", msg);
 
         int requestID = (int) System.currentTimeMillis();
         Intent notificationIntent;
@@ -93,6 +97,7 @@ public class GcmIntentService extends IntentService {
             notificationIntent = new Intent(this, WalkDone.class);
         }
         notificationIntent.putExtra("id", msg);
+        notificationIntent.putExtra("sender_id", sender_id);
         PendingIntent contentIntent = PendingIntent.getActivity(this, requestID, notificationIntent, PendingIntent.FLAG_ONE_SHOT);
 
         NotificationCompat.Builder mBuilder =

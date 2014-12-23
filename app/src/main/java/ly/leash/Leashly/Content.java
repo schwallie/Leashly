@@ -16,24 +16,24 @@ import java.util.Map;
 public class Content implements Serializable {
 
 
-
     private List<String> registration_ids;
-    private Map<String,String> data;
+    private Map<String, String> data;
 
 
-    public void addRegId(String regId){
-        if(registration_ids == null)
+    public void addRegId(String regId) {
+        if (registration_ids == null)
             registration_ids = new LinkedList<String>();
         registration_ids.add(regId);
     }
 
-    public void createData(String title, String message, String id){
-        if(data == null)
-            data = new HashMap<String,String>();
+    public void createData(String title, String message, String id, String sender_id) {
+        if (data == null)
+            data = new HashMap<String, String>();
 
         data.put("title", title);
         data.put("message", message);
         data.put("id", id);
+        data.put("sender_id", sender_id);
     }
 
 

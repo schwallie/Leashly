@@ -3,8 +3,8 @@ package ly.leash.Leashly;
 /**
  * Created by schwallie on 11/23/2014.
  */
-import android.app.ProgressDialog;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -12,31 +12,32 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
-import ly.leash.Leashly.adapter.CustomListAdapter;
-import ly.leash.Leashly.app.AppController;
-import ly.leash.Leashly.model.viewer;
-
-import java.util.ArrayList;
-import java.util.List;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import android.util.Log;
-import android.widget.Toast;
-
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.javadocmd.simplelatlng.LatLng;
 import com.javadocmd.simplelatlng.LatLngTool;
 import com.javadocmd.simplelatlng.util.LengthUnit;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import ly.leash.Leashly.adapter.CustomListAdapter;
+import ly.leash.Leashly.app.AppController;
+import ly.leash.Leashly.model.viewer;
 
 
 public class AvailableList extends ActionBarActivity {
@@ -45,18 +46,17 @@ public class AvailableList extends ActionBarActivity {
 
     // Movies json url
     private static final String url = "http://leash.ly/webservice/get_active.php";
+    ListView leftDrawerList;
+    ArrayAdapter<String> navigationDrawerAdapter;
+    String sender_id;
     private ProgressDialog pDialog;
     private List<viewer> movieList = new ArrayList<viewer>();
     private ListView listView;
     private CustomListAdapter adapter;
-
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
-    private ListView leftDrawerList;
-    private ArrayAdapter<String> navigationDrawerAdapter;
     private String[] leftSliderData = {"Logout", "Contact Us"};
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +74,8 @@ public class AvailableList extends ActionBarActivity {
         if (extras != null) {
             lat = extras.getDouble("lat");
             lon = extras.getDouble("lon");
+            sender_id = extras.getString("user_id");
+            Log.d("Avail_list sender_id", sender_id);
         }
         listView = (ListView) findViewById(R.id.list);
         adapter = new CustomListAdapter(this, movieList);
@@ -133,13 +135,14 @@ public class AvailableList extends ActionBarActivity {
                             public void onItemClick(AdapterView<?> parent, View view,
                                                     int position, long id) {
                                 String clicked_at = null;
-                                try{
+                                try {
                                     clicked_at = response.getString(position);
-                                } catch(JSONException e) {
+                                } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-                                Intent i = new Intent(getApplicationContext(),full_view_walker.class);
+                                Intent i = new Intent(getApplicationContext(), full_view_walker.class);
                                 i.putExtra("data", clicked_at);
+                                i.putExtra("sender_id", sender_id);
                                 startActivity(i);
 
                             }
@@ -163,8 +166,8 @@ public class AvailableList extends ActionBarActivity {
         leftDrawerList = (ListView) findViewById(R.id.left_drawer);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-        navigationDrawerAdapter=new ArrayAdapter<String>( AvailableList.this, android.R.layout.simple_list_item_1, leftSliderData);
-        Log.d("nsv", navigationDrawerAdapter+"");
+        navigationDrawerAdapter = new ArrayAdapter<String>(AvailableList.this, android.R.layout.simple_list_item_1, leftSliderData);
+        Log.d("nsv", navigationDrawerAdapter + "");
         leftDrawerList.setAdapter(navigationDrawerAdapter);
         leftDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -253,7 +256,6 @@ public class AvailableList extends ActionBarActivity {
             pDialog = null;
         }
     }
-
 
 
 }

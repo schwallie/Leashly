@@ -29,9 +29,9 @@ import java.util.List;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class POST2GCM {
 
-    public static void post(String regId, String msg_title){
+    public static void post(String regId, String msg_title, String sender_id) {
         PostAsync task_ = new PostAsync();
-        task_.execute(regId, msg_title);
+        task_.execute(regId, msg_title, sender_id);
 
     }
 
@@ -41,28 +41,26 @@ public class POST2GCM {
             try {
                 //THIS HAS TO BE PUT ON SERVER
                 String apiKey = "AIzaSyDZcR45gjcuqBrQFdlsyA_MEDxp-YLgPB4";
+                String title = params[1];
+                String sender_id = params[2];
+                String to_id = params[0];
+                Log.d("GCM to_id", to_id + "");
+                Log.d("GCM sender_id", sender_id + "");
                 Content content = new Content();
                 List<NameValuePair> params_j = new ArrayList<NameValuePair>();
-                params_j.add(new BasicNameValuePair("user_id", params[0]));
+                params_j.add(new BasicNameValuePair("user_id", to_id));
                 JSONParser jsonParser = new JSONParser();
 
                 // testing on Emulator:
                 String GCM_URL = "http://leash.ly/webservice/get_walker_gcm.php";
-
-                // JSON element ids from repsonse of php script:
-                Log.d("request!", "starting");
-                // getting product details by making HTTP request
                 JSONObject json_obj = jsonParser.makeHttpRequest(GCM_URL, "POST",
                         params_j);
-
-                // check your log for json response
                 Log.d("Json", json_obj.toString());
                 // json success tag
                 String gcm_id = null;
                 try {
                     JSONArray innerProjectArray = json_obj.getJSONArray("result");
                     for (int i = 0; i < innerProjectArray.length(); i++) {
-
                         JSONObject obj = innerProjectArray.getJSONObject(i);
                         gcm_id = obj.getString("GCM_ID");
                     }
@@ -71,13 +69,12 @@ public class POST2GCM {
                     e.printStackTrace();
                 }
                 content.addRegId(gcm_id);
-                String title = params[1];
                 if (title.equals("NewWalk")) {
-                    content.createData("New Walk!", "You have a new walk waiting for you!", params[0]);
+                    content.createData("New Walk!", "You have a new walk waiting for you!", to_id, sender_id);
                 } else if (title.equals("AcceptWalk")) {
-                    content.createData("Walker Accepted", "Your walker is on the way!", params[0]);
+                    content.createData("Walker Accepted", "Your walker is on the way!", to_id, sender_id);
                 } else if (title.equals("WalkDone")) {
-                    content.createData("Walk Done", "Click here for details", params[0]);
+                    content.createData("Walk Done", "Click here for details", to_id, sender_id);
                 }
                 // 1. URL
                 URL url = new URL("https://android.googleapis.com/gcm/send");
@@ -112,7 +109,7 @@ public class POST2GCM {
                 int responseCode = conn.getResponseCode();
                 System.out.println("\nSending 'POST' request to URL : " + url);
                 System.out.println("Response Code : " + responseCode);
-
+                Log.d("content", conn.getContent().toString());
                 BufferedReader in = new BufferedReader(
                         new InputStreamReader(conn.getInputStream()));
                 String inputLine;

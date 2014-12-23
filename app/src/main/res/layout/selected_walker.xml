@@ -2,73 +2,80 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:padding="5dp"
-    android:id="@+id/rel_selected">
-    <!-- Thumbnail Image -->
-    <com.android.volley.toolbox.NetworkImageView
-        android:id="@+id/pic_selected"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_alignParentLeft="true"
-        android:layout_marginRight="8dp" />
+    android:padding="5dp">
 
-    <TextView
-        android:id="@+id/title_selected"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/thumbnail"
-        android:layout_toRightOf="@+id/thumbnail"
-        android:textSize="20dp"
-        android:textStyle="bold"
-        style="@style/Base.TextAppearance.AppCompat.Small.Inverse" />
-
-    <TextView
-        android:id="@+id/bio_selected"
+    <RelativeLayout
+        android:id="@+id/rel_selected"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textSize="15dp"
-        style="@style/Base.TextAppearance.AppCompat.Small"
-        android:layout_below="@+id/pic_selected"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="25dp" />
+        android:layout_height="fill_parent"
+        android:padding="5dp">
+        <!-- Thumbnail Image -->
+        <com.android.volley.toolbox.NetworkImageView
+            android:id="@+id/pic_selected"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="8dp" />
 
-    <TextView
-        android:id="@+id/exp_selected"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:textColor="@color/year"
-        android:textSize="@dimen/year" />
+        <TextView
+            android:id="@+id/title_selected"
+            style="@style/Base.TextAppearance.AppCompat.Small.Inverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/thumbnail"
+            android:layout_toRightOf="@+id/thumbnail"
+            android:textSize="20dp"
+            android:textStyle="bold" />
 
-    <ImageView
-        android:id="@+id/ratings_img_selected"
-        android:layout_width="100dp"
-        android:layout_height="30dp"
-        android:src="@drawable/paws_rating"
-        android:contentDescription="ratings"
-        android:layout_below="@+id/first_name_selected"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp" />
+        <TextView
+            android:id="@+id/bio_selected"
+            style="@style/Base.TextAppearance.AppCompat.Small"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/pic_selected"
+            android:layout_marginTop="25dp"
+            android:textSize="15dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/first_name_selected"
-        android:id="@+id/first_name_selected"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        <TextView
+            android:id="@+id/exp_selected"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:textColor="@color/year"
+            android:textSize="@dimen/year" />
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/backbutton"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:src="@drawable/back_button"
-        android:paddingBottom="32dp"
-        android:paddingLeft="24dp" />
+        <ImageView
+            android:id="@+id/ratings_img_selected"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:layout_below="@+id/first_name_selected"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:contentDescription="ratings"
+            android:src="@drawable/paws_rating" />
+
+        <TextView
+            android:id="@+id/first_name_selected"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:text="@string/first_name_selected"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <ImageView
+            android:id="@+id/backbutton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:paddingBottom="32dp"
+            android:paddingLeft="24dp"
+            android:src="@drawable/back_button" />
+
+    </RelativeLayout>
 </RelativeLayout>

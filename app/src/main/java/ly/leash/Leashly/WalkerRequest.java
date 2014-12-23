@@ -1,10 +1,8 @@
 package ly.leash.Leashly;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -12,8 +10,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -25,6 +21,7 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
     ImageButton deny;
     TextView thanks_txt, click_below;
     String id = null;
+    String sender_id = null;
     private Handler mHandler = new Handler();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +35,9 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             id = extras.getString("id");
-            Log.d("ID", id);
+            sender_id = extras.getString("sender_id");
+            Log.d("walk request ID", id + "");
+            Log.d("walk request sender", sender_id + "");
         }
         fabButton = new FloatingActionButton.Builder(this)
                 .withDrawable(getResources().getDrawable(R.drawable.checkmark))
@@ -58,7 +57,7 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
         Log.d("ID",v.getId()+"");
         switch (v.getId()) {
             case -1:
-                POST2GCM.post(id, "AcceptWalk");
+                POST2GCM.post(sender_id, "AcceptWalk", id);
                 Animation fadeout = AnimationUtils.loadAnimation(this, R.anim.fadeout);
                 fabButton.startAnimation(fadeout);
                 deny.startAnimation(fadeout);
@@ -78,9 +77,6 @@ addNewFab();
                 break;
         }
     }
-    public void walkStarted() {
-
-    }
     public void addNewFab() {
         acceptFabButton = new FloatingActionButton.Builder(this)
                 .withDrawable(getResources().getDrawable(R.drawable.checkmark))
@@ -96,6 +92,7 @@ addNewFab();
                                                    //NEED TO SEND GCM TO USER
                                                    Intent i = new Intent(getApplicationContext(),WalkStarted.class);
                                                    i.putExtra("user", id);
+                                                   i.putExtra("sender_id", sender_id);
                                                    startActivity(i);
                                                }
                                            }

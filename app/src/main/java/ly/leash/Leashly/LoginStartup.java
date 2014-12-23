@@ -3,7 +3,6 @@ package ly.leash.Leashly;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -30,15 +29,15 @@ import java.util.ArrayList;
  * Created by schwallie on 12/11/2014.
  */
 public class LoginStartup extends AsyncTask<String, Void, Void> {
+    private final Context context;
     String username;
     GoogleCloudMessaging gcm;
     String regid;
     String PROJECT_NUMBER = "621850944390";
-    private final Context context;
 
     public LoginStartup(String username, Context context) {
         //super();
-        Log.d("usernameInLogin", username+"");
+        Log.d("usernameInLogin", username + "");
         this.context = context;
     }
 
@@ -55,7 +54,7 @@ public class LoginStartup extends AsyncTask<String, Void, Void> {
         username = params[0];
         ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
         nameValuePairs.add(new BasicNameValuePair("user", username));
-        Log.d("getUserInfo", username+"");
+        Log.d("getUserInfo", username + "");
 
 //http post
         try {
@@ -112,7 +111,7 @@ public class LoginStartup extends AsyncTask<String, Void, Void> {
                 Intent i = new Intent(context, AvailableList.class);
                 //finish();
                 i.putExtra("user", username);
-                i.putExtra("user_id", user_id);
+                i.putExtra("user_id", user_id + "");
                 i.putExtra("lat", lat);
                 i.putExtra("lon", lon);
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -121,7 +120,7 @@ public class LoginStartup extends AsyncTask<String, Void, Void> {
                 Intent i = new Intent(context, WalkerMain.class);
                 //finish();
                 i.putExtra("user", username);
-                i.putExtra("user_id", user_id);
+                i.putExtra("user_id", user_id + "");
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(i);
             }

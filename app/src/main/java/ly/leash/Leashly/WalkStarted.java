@@ -18,6 +18,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -59,6 +60,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class WalkStarted extends ActionBarActivity implements View.OnClickListener,
@@ -68,10 +70,15 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
 
 
     public static final int MEDIA_TYPE_IMAGE = 1;
+    private static final String REGISTER_URL = "http://leash.ly/webservice/register_walk_details.php";
+    //ids
+    private static final String TAG_SUCCESS = "success";
+    private static final String TAG_MESSAGE = "message";
     String user = null;
     Button walk_fin;
     ImageButton camera_btn;
     ProgressDialog dialog;
+    String loc_of_image;
     LocationRequest mLocationRequest;
     GoogleApiClient mLocationClient;
     LatLng prev_latlng;
@@ -81,8 +88,16 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
     int REQUEST_IMAGE = 1;
     String save_loc = null;
     Integer camera_done = 0;
+    long startTime;
+    long endTime;
+    long duration;  //divide by 1000000 to get milliseconds.
+    String sender_id;
+    // JSON parser class
+    JSONParser jsonParser = new JSONParser();
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private Uri fileUri;
+    // Progress Dialog
+    private ProgressDialog pDialog;
 
     /**
      * Create a file Uri for saving an image or video
@@ -137,8 +152,11 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             user = extras.getString("user");
-            Log.d("ID", user + "");
+            sender_id = extras.getString("sender_id");
+            Log.d("walk start ID", user + "");
+            Log.d("walk start sender_id", sender_id + "");
         }
+        startTime = System.nanoTime();
         save_loc = Environment.getExternalStorageDirectory().toString() + "/MAP_" + dte + "_userId_" + user + ".png";
         walk_fin = (Button) findViewById(R.id.walk_finished_button);
         camera_btn = (ImageButton) findViewById(R.id.camera_btn);
@@ -164,9 +182,10 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
                 //wakeLock.release();
                 //dialog = ProgressDialog.show(WalkStarted.this, "Uploading",
                 //      "Please wait...");
+                endTime = System.nanoTime();
+                duration = (endTime - startTime) / 1000000000;  //divide by 1000000 to get milliseconds.
                 LocationServices.FusedLocationApi.removeLocationUpdates(mLocationClient, this);
                 new CaptureMapScreen().execute();
-
                 //Log.d("At dismiss", "");
                 //dialog.dismiss();
 
@@ -256,18 +275,13 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
 
     }
 
-    private void finishActivity() {
-        if (camera_done == 1) {
-            //Finish up
-            POST2GCM.post(user, "WalkDone");
-        }
-    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE && resultCode == Activity.RESULT_OK) {
             // Image captured and saved to fileUri specified in the Intent
             Log.d("requestCode", requestCode + "");
-            String loc_of_image = fileUri.getPath();
+            loc_of_image = fileUri.getPath();
             Log.d("Image_Loc", loc_of_image);
             try {
                 UploadToServer uts;
@@ -330,6 +344,88 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         Log.i("walkstarted", "GoogleApiClient connection has failed");
     }
 
+
+    class finishActivity extends AsyncTask<String, String, String> {
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(WalkStarted.this);
+            pDialog.setMessage("Creating User...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(true);
+            pDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... args) {
+            // TODO Auto-generated method stub
+            // Check for success tag
+            int success;
+            if (camera_done == 1) {
+                //Finish up
+                try {
+                    // Building Parameters
+                    //:walker_id, :requester_id, :dogs_walked, :duration_sec, :dog_1s, :dog_2s, :route_taken, :map_loc, :img_loc
+                    String dogs_walked = "0";
+                    String dog_1s = "0";
+                    String dog_2s = "0";
+
+                    List<NameValuePair> params = new ArrayList<NameValuePair>();
+                    params.add(new BasicNameValuePair("walker_id", user));
+                    params.add(new BasicNameValuePair("requester_id", sender_id));
+                    params.add(new BasicNameValuePair("duration_sec", duration + ""));
+                    params.add(new BasicNameValuePair("dogs_walked", dogs_walked));
+                    params.add(new BasicNameValuePair("dog_1s", dog_1s));
+                    params.add(new BasicNameValuePair("dog_2s", dog_2s));
+                    params.add(new BasicNameValuePair("route_taken", "0"));
+                    params.add(new BasicNameValuePair("map_loc", save_loc));
+                    params.add(new BasicNameValuePair("img_loc", loc_of_image));
+                    Log.d("request!", "starting");
+                    Log.d("params", params.toString());
+                    JSONObject json = jsonParser.makeHttpRequest(
+                            REGISTER_URL, "POST", params);
+                    //Log.d("completed",json.toString());
+                    // full json response
+                    Log.d("Registering attempt", json.toString());
+
+                    // json success element
+                    success = json.getInt(TAG_SUCCESS);
+                    if (success == 1) {
+                        Log.d("User Created!", json.toString());
+                        finish();
+                        return json.getString(TAG_MESSAGE);
+                    } else {
+                        Log.d("Registering Failure!", json.getString(TAG_MESSAGE));
+                        return json.getString(TAG_MESSAGE);
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                return null;
+
+            }
+            return null;
+        }
+
+        protected void onPostExecute(String file_url) {
+            // dismiss the dialog once product deleted
+            pDialog.dismiss();
+            if (file_url != null) {
+                Toast.makeText(WalkStarted.this, file_url, Toast.LENGTH_LONG).show();
+            }
+            if (camera_done == 1) {
+                //Finish up
+                POST2GCM.post(sender_id, "WalkDone", user);
+            }
+
+        }
+
+
+    }
     public class CaptureMapScreen extends AsyncTask<Void, Void, String> {
 
         @Override
@@ -460,11 +556,12 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
             Log.d("At dismiss2", "");
             dialog.dismiss();
             if (walk_fin.getVisibility() == walk_fin.VISIBLE) {
-                Animation fadeout = AnimationUtils.loadAnimation(WalkStarted.this, R.anim.fadeout);
-                walk_fin.startAnimation(fadeout);
+                //Animation fadeout = AnimationUtils.loadAnimation(WalkStarted.this, R.anim.fadeout);
+                //walk_fin.startAnimation(fadeout);
+                walk_fin.setVisibility(View.GONE);
+                walk_fin.setEnabled(false);
                 Animation fadein = AnimationUtils.loadAnimation(WalkStarted.this, R.anim.fadein);
                 camera_btn.startAnimation(fadein);
-                walk_fin.setVisibility(View.INVISIBLE);
                 camera_btn.setVisibility(View.VISIBLE);
             }
         }
@@ -478,7 +575,7 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
 
         @Override
         public void onPostExecute(Integer serverResponse) {
-            finishActivity();
+            new finishActivity().execute();
         }
 
         public Integer doInBackground(String... args) {
