@@ -23,6 +23,7 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
     String id = null;
     String sender_id = null;
     private Handler mHandler = new Handler();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +55,7 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
 
     @Override
     public void onClick(View v) {
-        Log.d("ID",v.getId()+"");
+        Log.d("ID", v.getId() + "");
         switch (v.getId()) {
             case -1:
                 POST2GCM.post(sender_id, "AcceptWalk", id);
@@ -67,7 +68,7 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
 
                 mHandler.postDelayed(new Runnable() {
                     public void run() {
-addNewFab();
+                        addNewFab();
                     }
                 }, 1500);
 
@@ -77,6 +78,7 @@ addNewFab();
                 break;
         }
     }
+
     public void addNewFab() {
         acceptFabButton = new FloatingActionButton.Builder(this)
                 .withDrawable(getResources().getDrawable(R.drawable.checkmark))
@@ -85,12 +87,11 @@ addNewFab();
 
                 .withButtonSize(70)
                 .create();
-        Log.d("user_intent", id+"");
+        Log.d("user_intent", id + "");
         acceptFabButton.setOnClickListener(new View.OnClickListener() {
                                                @Override
                                                public void onClick(View v) {
-                                                   //NEED TO SEND GCM TO USER
-                                                   Intent i = new Intent(getApplicationContext(),WalkStarted.class);
+                                                   Intent i = new Intent(getApplicationContext(), WalkStarted.class);
                                                    i.putExtra("user", id);
                                                    i.putExtra("sender_id", sender_id);
                                                    startActivity(i);

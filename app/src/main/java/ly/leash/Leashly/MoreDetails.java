@@ -18,7 +18,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
  * Created by schwallie on 12/22/2014.
  */
 public class MoreDetails extends ActionBarActivity implements View.OnClickListener {
-    String id, sender_id, gcm_id;
+    String id, sender_id, gcm_id, data;
     GoogleCloudMessaging gcm;
     Button start_walk;
 
@@ -35,8 +35,8 @@ public class MoreDetails extends ActionBarActivity implements View.OnClickListen
         if (extras != null) {
             sender_id = extras.getString("sender_id");
             gcm_id = extras.getString("gcm_id");
-            Log.d("walk request ID", id + "");
-            Log.d("walk request sender", sender_id + "");
+            Log.d("more_details_walk request ID", gcm_id + "");
+            Log.d("more_details_walk request sender", sender_id + "");
         }
 
         Animation fadein = AnimationUtils.loadAnimation(MoreDetails.this, R.anim.fadein);

@@ -32,7 +32,7 @@ public class full_view_walker extends ActionBarActivity implements View.OnClickL
     TextView fname;
     NetworkImageView thumbNail;
     FloatingActionButton fabButton;
-
+    String data = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,11 +49,10 @@ public class full_view_walker extends ActionBarActivity implements View.OnClickL
                 .create();
         fabButton.setOnClickListener(this);
         Bundle extras = getIntent().getExtras();
-        String data = null;
         if (extras != null) {
             data = extras.getString("data");
             sender_id = extras.getString("sender_id");
-            Log.d("Data", data);
+            Log.d("full_view Data", data);
             Log.d("full_view sender_id", sender_id + "");
 
             try {
@@ -91,6 +90,7 @@ public class full_view_walker extends ActionBarActivity implements View.OnClickL
                 Intent i = new Intent(getBaseContext(), MoreDetails.class);
                 i.putExtra("sender_id", sender_id);
                 i.putExtra("gcm_id", gcm_id);
+                i.putExtra("data", data);
                 startActivity(i);
                 //getRegId();
         }

@@ -352,7 +352,7 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         protected void onPreExecute() {
             super.onPreExecute();
             pDialog = new ProgressDialog(WalkStarted.this);
-            pDialog.setMessage("Creating User...");
+            pDialog.setMessage("Finishing Up...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(true);
             pDialog.show();
@@ -384,21 +384,22 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
                     params.add(new BasicNameValuePair("img_loc", loc_of_image));
                     Log.d("request!", "starting");
                     Log.d("params", params.toString());
-                    JSONObject json = jsonParser.makeHttpRequest(
+                    JSONObject json2 = jsonParser.makeHttpRequest(
                             REGISTER_URL, "POST", params);
                     //Log.d("completed",json.toString());
                     // full json response
-                    Log.d("Registering attempt", json.toString());
+                    System.out.println(json2);
+                    Log.d("Updating Walk Details", json2.toString());
 
                     // json success element
-                    success = json.getInt(TAG_SUCCESS);
+                    success = json2.getInt(TAG_SUCCESS);
                     if (success == 1) {
-                        Log.d("User Created!", json.toString());
-                        finish();
-                        return json.getString(TAG_MESSAGE);
+                        Log.d("Message", json2.getString(TAG_MESSAGE));
+                        return json2.getString(TAG_MESSAGE);
                     } else {
-                        Log.d("Registering Failure!", json.getString(TAG_MESSAGE));
-                        return json.getString(TAG_MESSAGE);
+                        Log.d("Registering Failure!", json2.getString(TAG_MESSAGE));
+                        Log.d("Message", json2.getString(TAG_MESSAGE));
+                        return json2.getString(TAG_MESSAGE);
 
                     }
                 } catch (JSONException e) {
@@ -426,6 +427,7 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
 
 
     }
+
     public class CaptureMapScreen extends AsyncTask<Void, Void, String> {
 
         @Override
