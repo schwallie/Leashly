@@ -388,7 +388,7 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
                             REGISTER_URL, "POST", params);
                     //Log.d("completed",json.toString());
                     // full json response
-                    System.out.println(json2);
+
                     Log.d("Updating Walk Details", json2.toString());
 
                     // json success element

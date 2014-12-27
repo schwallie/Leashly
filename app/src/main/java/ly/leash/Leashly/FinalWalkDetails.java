@@ -31,6 +31,7 @@ public class FinalWalkDetails extends ActionBarActivity implements View.OnClickL
             Log.d("walk request ID", id + "");
             Log.d("walk request sender", sender_id + "");
         }
+
     }
 
 
@@ -42,9 +43,6 @@ public class FinalWalkDetails extends ActionBarActivity implements View.OnClickL
                 //POST2GCM.post(sender_id, "AcceptWalk", id);
                 Animation fadeout = AnimationUtils.loadAnimation(this, R.anim.fadeout);
                 Animation fadein = AnimationUtils.loadAnimation(this, R.anim.fadein);
-                break;
-            case R.id.deny_button:
-                // do stuff;
                 break;
         }
     }

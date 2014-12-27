@@ -49,6 +49,7 @@ public class AvailableList extends ActionBarActivity {
     ListView leftDrawerList;
     ArrayAdapter<String> navigationDrawerAdapter;
     String sender_id;
+    double distanceInMiles;
     private ProgressDialog pDialog;
     private List<viewer> movieList = new ArrayList<viewer>();
     private ListView listView;
@@ -88,6 +89,8 @@ public class AvailableList extends ActionBarActivity {
         // Creating volley request obj
         final Double finalLat = lat;
         final Double finalLon = lon;
+        final Double finalLat1 = lat;
+        final Double finalLon1 = lon;
         JsonArrayRequest movieReq = new JsonArrayRequest(url,
                 new Response.Listener<JSONArray>() {
                     @Override
@@ -103,7 +106,7 @@ public class AvailableList extends ActionBarActivity {
                                 viewer movie = new viewer();
                                 LatLng point1 = new LatLng(obj.getDouble("lat"), obj.getDouble("long"));
                                 LatLng point2 = new LatLng(finalLat, finalLon);
-                                double distanceInMiles = LatLngTool.distance(point1, point2, LengthUnit.MILE);
+                                distanceInMiles = LatLngTool.distance(point1, point2, LengthUnit.MILE);
                                 movie.setTitle(obj.getString("first_name"));
                                 movie.setThumbnailUrl(obj.getString("pic"));
                                 movie.setRating(((String) obj.getString("experience")));
@@ -142,6 +145,8 @@ public class AvailableList extends ActionBarActivity {
                                 }
                                 Intent i = new Intent(getApplicationContext(), full_view_walker.class);
                                 i.putExtra("data", clicked_at);
+                                i.putExtra("lat", finalLat1);
+                                i.putExtra("lon", finalLon1);
                                 i.putExtra("sender_id", sender_id);
                                 startActivity(i);
 

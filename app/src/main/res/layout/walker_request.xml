@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:id="@+id/requested_walk_relative">
+    android:id="@+id/requested_walk_relative"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:nestedScrollingEnabled="true">
+
     <android.support.v7.widget.Toolbar
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/toolbar"
@@ -10,107 +13,179 @@
         android:background="?attr/colorPrimaryDark"/>
 
     <TextView
+        android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="New Walk!"
-        android:id="@+id/textView3"
         android:layout_below="@+id/toolbar"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:text="New Walk!"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <RelativeLayout
+        android:id="@+id/distance_rel_view"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView3"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/distance_rel_view">
+        android:layout_below="@+id/textView3">
 
         <TextView
+            android:id="@+id/distance_request"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:id="@+id/distance_request"
             android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/textView4"
             android:layout_toEndOf="@+id/textView5"
-            android:paddingLeft="10dp" />
+            android:layout_toRightOf="@+id/textView4"
+            android:paddingLeft="10dp"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
+            android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Distance:"
-        android:id="@+id/textView4"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
         android:layout_below="@+id/textView3"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+            android:text="Distance:"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
     </RelativeLayout>
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Instructions"
         android:id="@+id/textView5"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="20dp"
-        android:layout_below="@+id/distance_rel_view" />
-    <ScrollView android:id="@+id/textAreaScroller"
-        android:layout_width="fill_parent"
-        android:layout_height="173px"
-        android:layout_x="0px"
-        android:layout_y="25px"
-        android:scrollbars="vertical"
-        android:layout_below="@+id/textView5"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="10dp">
-        <TextView
-            android:id="@+id/instruct_request"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/fbedittext"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/fbedittext"
-            android:layout_marginTop="22dp"
-            android:lines="5"
-            android:text="" />
-    </ScrollView>
-
-    <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/deny_button"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/distance_rel_view"
+        android:layout_marginTop="20dp"
+        android:text="Normal Instructions"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/norm_instruct"
+        android:layout_marginTop="15dp"
+        android:text="Extra Instructions for walk"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/addtl_instruct"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textView6"
+        android:layout_marginTop="10dp"
+        android:lines="3"
+        android:maxLines="3"
+        android:nestedScrollingEnabled="true"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/norm_instruct"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textView5"
+        android:lines="3"
+        android:maxLines="3"
+        android:nestedScrollingEnabled="true"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/addtl_instruct"
+        android:text="Who do you need to walk?"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <Button
+        android:id="@+id/start_walk_btn"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:clickable="true"
-        android:paddingLeft="85dp"
-        android:src="@drawable/x_button"
-        android:paddingBottom="36dp"
-        android:background="@null" />
+        android:text="Click to start"
+        android:theme="@style/Base.Widget.AppCompat.ActionButton"
+        android:visibility="invisible" />
+
+    <com.android.volley.toolbox.NetworkImageView
+        android:id="@+id/dog_1_pic"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textView7"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp" />
+
+    <com.android.volley.toolbox.NetworkImageView
+        android:id="@+id/dog_2_pic"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentEnd="false"
+        android:layout_alignTop="@+id/dog_1_pic"
+        android:layout_marginLeft="20dp"
+        android:layout_toEndOf="@+id/dog_1_pic"
+        android:layout_toRightOf="@+id/dog_1_pic" />
+
+    <com.android.volley.toolbox.NetworkImageView
+        android:id="@+id/dog_3_pic"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignTop="@+id/dog_2_pic"
+        android:layout_marginLeft="20dp"
+        android:layout_toEndOf="@+id/dog_2_pic"
+        android:layout_toRightOf="@+id/dog_2_pic" />
 
     <TextView
+        android:id="@+id/dog_1_walk_deets"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Thanks for accepting!"
-        android:id="@+id/thanks_accept"
-        android:layout_below="@+id/textAreaScroller"
-        android:layout_centerHorizontal="true"
-        android:paddingTop="50dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/dog_1_pic"
+        android:textAppearance="?android:attr/textAppearanceSmall"
         android:visibility="invisible" />
 
     <TextView
+        android:id="@+id/dog_2_walk_deets"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Please click below when you start your walk!"
-        android:id="@+id/click_below_txt"
-        android:layout_below="@+id/thanks_accept"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="59dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/dog_1_walk_deets"
+        android:layout_marginTop="10dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
         android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/dog_3_walk_deets"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/dog_2_walk_deets"
+        android:layout_marginTop="10dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:visibility="invisible" />
+
+    <Button
+        android:id="@+id/accept_walk_btn"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="Accept Walk" />
 
 </RelativeLayout>

@@ -14,6 +14,9 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
+import com.javadocmd.simplelatlng.LatLng;
+import com.javadocmd.simplelatlng.LatLngTool;
+import com.javadocmd.simplelatlng.util.LengthUnit;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,6 +33,7 @@ public class full_view_walker extends ActionBarActivity implements View.OnClickL
     ImageLoader imageLoader = AppController.getInstance().getImageLoader();
     TextView bio;
     TextView fname;
+    double lat, lon, distance;
     NetworkImageView thumbNail;
     FloatingActionButton fabButton;
     String data = null;
@@ -52,6 +56,8 @@ public class full_view_walker extends ActionBarActivity implements View.OnClickL
         if (extras != null) {
             data = extras.getString("data");
             sender_id = extras.getString("sender_id");
+            lat = extras.getDouble("lat");
+            lon = extras.getDouble("lon");
             Log.d("full_view Data", data);
             Log.d("full_view sender_id", sender_id + "");
 
@@ -62,6 +68,9 @@ public class full_view_walker extends ActionBarActivity implements View.OnClickL
                 bio.setText(jsonObj.getString("bio"));
                 fname.setText(jsonObj.getString("first_name"));
                 gcm_id = jsonObj.getString("user_id");
+                LatLng point1 = new LatLng(jsonObj.getDouble("lat"), jsonObj.getDouble("long"));
+                LatLng point2 = new LatLng(lat, lon);
+                distance = LatLngTool.distance(point1, point2, LengthUnit.MILE);
                 if (imageLoader == null)
                     imageLoader = AppController.getInstance().getImageLoader();
                 thumbNail = (NetworkImageView) findViewById(R.id.pic_selected);
@@ -90,6 +99,7 @@ public class full_view_walker extends ActionBarActivity implements View.OnClickL
                 Intent i = new Intent(getBaseContext(), MoreDetails.class);
                 i.putExtra("sender_id", sender_id);
                 i.putExtra("gcm_id", gcm_id);
+                i.putExtra("distance", distance);
                 i.putExtra("data", data);
                 startActivity(i);
                 //getRegId();
