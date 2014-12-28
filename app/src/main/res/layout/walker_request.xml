@@ -118,34 +118,36 @@
         android:theme="@style/Base.Widget.AppCompat.ActionButton"
         android:visibility="invisible" />
 
-    <com.android.volley.toolbox.NetworkImageView
-        android:id="@+id/dog_1_pic"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+    <LinearLayout
+        android:id="@+id/imgs_rel_view"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/textView7"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp" />
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp">
 
-    <com.android.volley.toolbox.NetworkImageView
+        <com.android.volley.toolbox.NetworkImageView
+            android:id="@+id/dog_1_pic"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_weight="1" />
+
+        <com.android.volley.toolbox.NetworkImageView
         android:id="@+id/dog_2_pic"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_alignParentEnd="false"
-        android:layout_alignTop="@+id/dog_1_pic"
-        android:layout_marginLeft="20dp"
-        android:layout_toEndOf="@+id/dog_1_pic"
-        android:layout_toRightOf="@+id/dog_1_pic" />
+            android:layout_weight="1" />
 
-    <com.android.volley.toolbox.NetworkImageView
+        <com.android.volley.toolbox.NetworkImageView
         android:id="@+id/dog_3_pic"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_alignTop="@+id/dog_2_pic"
-        android:layout_marginLeft="20dp"
-        android:layout_toEndOf="@+id/dog_2_pic"
-        android:layout_toRightOf="@+id/dog_2_pic" />
+            android:layout_weight="1" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/dog_1_walk_deets"
@@ -153,7 +155,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/dog_1_pic"
+        android:layout_below="@+id/imgs_rel_view"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:visibility="invisible" />
 

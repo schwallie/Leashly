@@ -3,11 +3,9 @@ package ly.leash.Leashly;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -30,11 +28,14 @@ import ly.leash.Leashly.app.AppController;
 
 /**
  * Created by schwallie on 12/4/2014.
+ * Leashly!
  */
 public class WalkerRequest extends ActionBarActivity implements View.OnClickListener {
-    FloatingActionButton fabButton, acceptFabButton;
+    //FloatingActionButton acceptFabButton;
     Button start_walk_btn, accept_walk_btn;
+    String dog_1_final_name, dog_2_final_name, dog_3_final_name;
     String id = null;
+    double lat, lon;
     String json_data, sender_id, dogs, addtl_instruct, main_instruct;
     String dog_1_color, dog_2_color, dog_3_color, dog_1_breed, dog_2_breed, dog_3_breed;
     String dog_1_weight, dog_2_weight, dog_3_weight, dog_1_pic, dog_2_pic, dog_3_pic;
@@ -46,7 +47,6 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
     String get_main_details = "http://leash.ly/webservice/get_data_id.php";
     JSONParser jsonParser = new JSONParser();
     NetworkImageView dog_1_pic_view, dog_2_pic_view, dog_3_pic_view;
-    private Handler mHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +73,7 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... args) {
-                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                List<NameValuePair> params = new ArrayList<>();
                 params.add(new BasicNameValuePair("id", id_of_walk));
                 JSONObject jobj = jsonParser.makeHttpRequest(get_url, "POST", params);
                 System.out.println(jobj);
@@ -92,7 +92,7 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
                     // do something
                 }
 
-                List<NameValuePair> id_params = new ArrayList<NameValuePair>();
+                List<NameValuePair> id_params = new ArrayList<>();
                 Log.d("sender_id", sender_id);
                 id_params.add(new BasicNameValuePair("user", sender_id));
                 JSONObject jobj_get_other = jsonParser.makeHttpRequest(get_main_details, "POST", id_params);
@@ -104,6 +104,8 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
                     }
                     JSONObject jobj_get_other_deets = new JSONObject(json_data);
                     main_instruct = jobj_get_other_deets.getString("key_details");
+                    lat = jobj_get_other_deets.getDouble("lat");
+                    lon = jobj_get_other_deets.getDouble("long");
                     dog_1_name = jobj_get_other_deets.getString("dog_1");
                     dog_2_name = jobj_get_other_deets.getString("dog_2");
                     dog_3_name = jobj_get_other_deets.getString("dog_3");
@@ -139,7 +141,6 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
                 norm_instruct.setText(main_instruct);
                 String[] parts = dogs.split(",");
                 int x = parts.length;
-                System.out.println(x);
                 //Dog3 can obly be 3
                 TextView dog_1_walk_deets = (TextView) findViewById(R.id.dog_1_walk_deets);
                 TextView dog_2_walk_deets = (TextView) findViewById(R.id.dog_2_walk_deets);
@@ -151,6 +152,7 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
                 if (!parts[0].equals(dog_1_name)) {
                     //Dog1 can be 1, 2, or 3
                     if (parts[0].equals(dog_2_name)) {
+
                         dog_1_walk_deets.setText("Name: " + parts[0] + " Color: " + dog_2_color + "  Weight: " + dog_2_weight + "  Breed:" + dog_2_breed);
                         dog_1_pic_view.setImageUrl("http://leash.ly/" + dog_2_pic, imageLoader);
 
@@ -158,7 +160,9 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
                         dog_1_walk_deets.setText("Name: " + parts[0] + " Color: " + dog_3_color + "  Weight: " + dog_3_weight + "  Breed: " + dog_3_breed);
                         dog_1_pic_view.setImageUrl("Name: " + "http://leash.ly/" + dog_3_pic, imageLoader);
                     }
-
+                } else if (x == 1) {
+                    dog_1_walk_deets.setText("Name: " + parts[0] + " Color: " + dog_1_color + "  Weight: " + dog_1_weight + "  Breed: " + dog_1_breed);
+                    dog_1_pic_view.setImageUrl("http://leash.ly/" + dog_1_pic, imageLoader);
                 } else if (!parts[1].equals(dog_2_name)) {
                     dog_2_walk_deets.setText("Name: " + parts[1] + " Color:" + dog_3_color + "  Weight: " + dog_3_weight + "  Breed: " + dog_3_breed);
                     dog_2_pic_view.setImageUrl("http://leash.ly/" + dog_3_pic, imageLoader);
@@ -169,11 +173,24 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
                     }
                 }
                 if (x == 1) {
+                    dog_1_final_name = parts[0];
                     dog_1_walk_deets.setVisibility(View.VISIBLE);
                 } else if (x == 2) {
+                    dog_1_final_name = parts[0];
+                    dog_2_final_name = parts[1];
+                    if (parts[1].equals(dog_2_name) && parts[0].equals(dog_1_name)) {
+                        dog_1_walk_deets.setText("Name: " + parts[0] + " Color: " + dog_1_color + "  Weight: " + dog_1_weight + "  Breed: " + dog_1_breed);
+                        dog_1_pic_view.setImageUrl("http://leash.ly/" + dog_1_pic, imageLoader);
+                        dog_2_walk_deets.setText("Name: " + parts[1] + " Color: " + dog_2_color + "  Weight: " + dog_2_weight + "  Breed: " + dog_2_breed);
+                        dog_2_pic_view.setImageUrl("http://leash.ly/" + dog_2_pic, imageLoader);
+                    }
+
                     dog_1_walk_deets.setVisibility(View.VISIBLE);
                     dog_2_walk_deets.setVisibility(View.VISIBLE);
                 } else {
+                    dog_1_final_name = parts[0];
+                    dog_2_final_name = parts[1];
+                    dog_3_final_name = parts[2];
                     dog_1_pic_view.setImageUrl("http://leash.ly/" + dog_1_pic, imageLoader);
                     dog_2_pic_view.setImageUrl("http://leash.ly/" + dog_2_pic, imageLoader);
                     dog_3_pic_view.setImageUrl("http://leash.ly/" + dog_3_pic, imageLoader);
@@ -183,7 +200,6 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
                     dog_1_walk_deets.setVisibility(View.VISIBLE);
                     dog_2_walk_deets.setVisibility(View.VISIBLE);
                     dog_3_walk_deets.setVisibility(View.VISIBLE);
-                    Log.d("In 3", "3");
                 }
 
             }
@@ -215,6 +231,8 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
                 //fabButton.setVisibility(View.GONE);
                 //fabButton.clearAnimation();
                 accept_walk_btn.startAnimation(fadeout);
+                accept_walk_btn.clearAnimation();
+                accept_walk_btn.setVisibility(View.GONE);
                 Animation fadein = AnimationUtils.loadAnimation(this, R.anim.fadein);
                 start_walk_btn.startAnimation(fadein);
                 break;
@@ -222,6 +240,12 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
                 Intent i = new Intent(getApplicationContext(), WalkStarted.class);
                 i.putExtra("user", id);
                 i.putExtra("sender_id", sender_id);
+                i.putExtra("walk_id", id_of_walk);
+                i.putExtra("lat", lat);
+                i.putExtra("lon", lon);
+                i.putExtra("dog_1", dog_1_final_name);
+                i.putExtra("dog_2", dog_2_final_name);
+                i.putExtra("dog_3", dog_3_final_name);
                 startActivity(i);
             case R.id.dog_1_pic:
                 /*View webViewLayout = ((LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE))
@@ -250,7 +274,7 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
         }
     }
 
-    public void addNewFab() {
+    /*public void addNewFab() {
         acceptFabButton = new FloatingActionButton.Builder(this)
                 .withDrawable(getResources().getDrawable(R.drawable.checkmark))
                 .withButtonColor(R.color.primaryColor)
@@ -265,10 +289,11 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
                                                    Intent i = new Intent(getApplicationContext(), WalkStarted.class);
                                                    i.putExtra("user", id);
                                                    i.putExtra("sender_id", sender_id);
+                                                   i.putExtra("walk_id", id_of_walk);
                                                    startActivity(i);
                                                }
                                            }
 
         );
-    }
+    }*/
 }

@@ -1,9 +1,12 @@
 package ly.leash.Leashly;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.location.Criteria;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -17,6 +20,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -34,25 +38,15 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -61,7 +55,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class WalkStarted extends ActionBarActivity implements View.OnClickListener,
         GoogleApiClient.ConnectionCallbacks,
@@ -74,11 +67,14 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
     //ids
     private static final String TAG_SUCCESS = "success";
     private static final String TAG_MESSAGE = "message";
+    final ArrayList<Integer> selectedItems = new ArrayList<>();
+    //CharSequence[] dog_items;
+    List<String> dog_items = new ArrayList<>();
     String user = null;
     Button walk_fin;
     ImageButton camera_btn;
     ProgressDialog dialog;
-    String loc_of_image;
+    String loc_of_image, img_name;
     LocationRequest mLocationRequest;
     GoogleApiClient mLocationClient;
     LatLng prev_latlng;
@@ -87,11 +83,13 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
     String dte = dateFormat.format(date);
     int REQUEST_IMAGE = 1;
     String save_loc = null;
+    String dog_1, dog_2, dog_3, note_text;
     Integer camera_done = 0;
     long startTime;
     long endTime;
     long duration;  //divide by 1000000 to get milliseconds.
-    String sender_id;
+    double lat, longitude;
+    String sender_id, walk_id, map_deets;
     // JSON parser class
     JSONParser jsonParser = new JSONParser();
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -102,14 +100,14 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
     /**
      * Create a file Uri for saving an image or video
      */
-    private static Uri getOutputMediaFileUri(int type) {
+    private Uri getOutputMediaFileUri(int type) {
         return Uri.fromFile(getOutputMediaFile(type));
     }
 
     /**
      * Create a File for saving an image or video
      */
-    private static File getOutputMediaFile(int type) {
+    private File getOutputMediaFile(int type) {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
 
@@ -130,8 +128,9 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File mediaFile;
         if (type == MEDIA_TYPE_IMAGE) {
+            img_name = "IMG_" + timeStamp + ".jpg";
             mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "IMG_" + timeStamp + ".jpg");
+                    img_name);
             Log.d("mediaDir", mediaFile.toString());
         } else {
             return null;
@@ -153,11 +152,30 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         if (extras != null) {
             user = extras.getString("user");
             sender_id = extras.getString("sender_id");
+            walk_id = extras.getString("walk_id");
+            dog_1 = extras.getString("dog_1");
+            dog_2 = extras.getString("dog_2");
+            dog_3 = extras.getString("dog_3");
+            lat = extras.getDouble("lat");
+            longitude = extras.getDouble("lon");
             Log.d("walk start ID", user + "");
             Log.d("walk start sender_id", sender_id + "");
         }
+        if (dog_1 != null) {
+            dog_items.add(dog_1 + " #1");
+            dog_items.add(dog_1 + " #2");
+        }
+        if (dog_2 != null) {
+            dog_items.add(dog_2 + " #1");
+            dog_items.add(dog_2 + " #2");
+        }
+        if (dog_3 != null) {
+            dog_items.add(dog_3 + " #1");
+            dog_items.add(dog_3 + " #2");
+        }
         startTime = System.nanoTime();
-        save_loc = Environment.getExternalStorageDirectory().toString() + "/MAP_" + dte + "_userId_" + user + ".png";
+        map_deets = "MAP_" + dte + "_userId_" + user + ".png";
+        save_loc = Environment.getExternalStorageDirectory().toString() + "/" + map_deets;
         walk_fin = (Button) findViewById(R.id.walk_finished_button);
         camera_btn = (ImageButton) findViewById(R.id.camera_btn);
         walk_fin.setOnClickListener(this);
@@ -230,36 +248,8 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         }
     }
 
-    /**
-     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-     * just add a marker near Africa.
-     * <p/>
-     * This should only be called once and when we are sure that {@link #mMap} is not null.
-     */
-
     private void setUpMap() {
-        //Bundle extras = getIntent().getExtras();
-        String data = null;
-        try {
-            data = new MapPosition().execute(user).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-        Log.d("data", data + "");
-        double lat, longitude;
-        try {
-            JSONObject jobj = new JSONObject(data);
-            lat = jobj.getDouble("lat");
-            longitude = jobj.getDouble("long");
 
-        } catch (JSONException e) {
-            lat = 0.0;
-            longitude = 0.0;
-            e.printStackTrace();
-            // do something
-        }
         mMap.setMyLocationEnabled(true); // false to disable
         prev_latlng = new LatLng(lat, longitude);
         MarkerOptions marker = new MarkerOptions().position(prev_latlng);
@@ -272,6 +262,9 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
 
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        Criteria myCriteria = new Criteria();
+        myCriteria.setAccuracy(Criteria.ACCURACY_FINE);
+
 
     }
 
@@ -284,10 +277,12 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
             loc_of_image = fileUri.getPath();
             Log.d("Image_Loc", loc_of_image);
             try {
+                camera_done = 1;
                 UploadToServer uts;
                 uts = new UploadToServer();
+                Log.d("Executing", "1");
                 uts.execute(loc_of_image);
-                camera_done = 1;
+                showDialog();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -297,6 +292,88 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         }
     }
 
+    public void showDialog() {
+
+        AlertDialog dialog;
+//following code will be in your activity.java file
+        // arraylist to keep the selected items
+        AlertDialog.Builder builder = new AlertDialog.Builder(WalkStarted.this);
+        builder.setTitle("Who did what?");
+        builder.setCancelable(false);
+        final CharSequence[] charSequenceItems = dog_items.toArray(new CharSequence[dog_items.size()]);
+        builder.setMultiChoiceItems(charSequenceItems, null,
+                new DialogInterface.OnMultiChoiceClickListener() {
+                    // indexSelected contains the index of item (of which checkbox checked)
+                    @Override
+                    public void onClick(DialogInterface dialog, int indexSelected,
+                                        boolean isChecked) {
+                        if (isChecked) {
+                            // If the user checked the item, add it to the selected items
+                            // write your code when user checked the checkbox
+                            selectedItems.add(indexSelected);
+                        } else if (selectedItems.contains(indexSelected)) {
+                            // Else, if the item is already in the array, remove it
+                            // write your code when user Uchecked the checkbox
+                            selectedItems.remove(Integer.valueOf(indexSelected));
+                        }
+                    }
+                })
+                // Set the action buttons
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        showNoteDialog();
+                        //  Your code when user clicked on OK
+                        //  You can write the code  to save the selected item here
+
+                    }
+
+                });
+
+        dialog = builder.create();//AlertDialog dialog; create like this outside onClick
+        dialog.show();
+
+    }
+
+    public void showNoteDialog() {
+
+        final AlertDialog dialog;
+        AlertDialog.Builder builder = new AlertDialog.Builder(WalkStarted.this);
+        builder.setTitle("Leave a note for the owner");
+        builder.setCancelable(false);
+        final EditText input = new EditText(this);
+        builder.setView(input);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                //  Your code when user clicked on OK
+                //  You can write the code  to save the selected item here
+
+            }
+
+        });
+
+        dialog = builder.create();//AlertDialog dialog; create like this outside onClick
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Boolean wantToCloseDialog = false;
+                //Do stuff, possibly set wantToCloseDialog to true then...
+                if (input.getText().toString().matches("")) {
+                    Toast.makeText(WalkStarted.this, "Please enter a note", Toast.LENGTH_LONG).show();
+                } else {
+                    note_text = input.getText().toString();
+                    wantToCloseDialog = true;
+                }
+                if (wantToCloseDialog)
+                    new finishActivity().execute();
+                dialog.dismiss();
+                //else dialog stays open. Make sure you have an obvious way to close the dialog especially if you set cancellable to false.
+            }
+        });
+
+    }
     @Override
     public void onLocationChanged(Location location) {
         // Report to the UI that the location was
@@ -354,7 +431,7 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
             pDialog = new ProgressDialog(WalkStarted.this);
             pDialog.setMessage("Finishing Up...");
             pDialog.setIndeterminate(false);
-            pDialog.setCancelable(true);
+            pDialog.setCancelable(false);
             pDialog.show();
         }
 
@@ -369,10 +446,28 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
                     // Building Parameters
                     //:walker_id, :requester_id, :dogs_walked, :duration_sec, :dog_1s, :dog_2s, :route_taken, :map_loc, :img_loc
                     String dogs_walked = "0";
-                    String dog_1s = "0";
-                    String dog_2s = "0";
+                    String dog_1s = "";
+                    String dog_2s = "";
+                    Log.d("dog_items", dog_items.toString());
+                    for (int x_ = 0; x_ < selectedItems.size(); x_++) {
+                        int temp = selectedItems.get(x_);
+                        if (dog_items.get(temp).contains("#1")) {
+                            if (dog_1s.matches("")) {
+                                dog_1s += dog_items.get(temp).split(" ")[0];
+                            } else {
+                                dog_1s += "," + dog_items.get(temp).split(" ")[0];
+                            }
+                        } else {
+                            if (dog_2s.matches("")) {
+                                dog_2s += dog_items.get(temp).split(" ")[0];
+                            } else {
+                                dog_2s += "," + dog_items.get(temp).split(" ")[0];
+                            }
+                        }
 
-                    List<NameValuePair> params = new ArrayList<NameValuePair>();
+                    }
+                    Log.d("input", note_text);
+                    List<NameValuePair> params = new ArrayList<>();
                     params.add(new BasicNameValuePair("walker_id", user));
                     params.add(new BasicNameValuePair("requester_id", sender_id));
                     params.add(new BasicNameValuePair("duration_sec", duration + ""));
@@ -380,8 +475,10 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
                     params.add(new BasicNameValuePair("dog_1s", dog_1s));
                     params.add(new BasicNameValuePair("dog_2s", dog_2s));
                     params.add(new BasicNameValuePair("route_taken", "0"));
-                    params.add(new BasicNameValuePair("map_loc", save_loc));
-                    params.add(new BasicNameValuePair("img_loc", loc_of_image));
+                    params.add(new BasicNameValuePair("map_loc", map_deets));
+                    params.add(new BasicNameValuePair("img_loc", img_name));
+                    params.add(new BasicNameValuePair("walk_id", walk_id));
+                    params.add(new BasicNameValuePair("walk_note", note_text));
                     Log.d("request!", "starting");
                     Log.d("params", params.toString());
                     JSONObject json2 = jsonParser.makeHttpRequest(
@@ -415,12 +512,11 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         protected void onPostExecute(String file_url) {
             // dismiss the dialog once product deleted
             pDialog.dismiss();
-            if (file_url != null) {
-                Toast.makeText(WalkStarted.this, file_url, Toast.LENGTH_LONG).show();
-            }
             if (camera_done == 1) {
                 //Finish up
-                POST2GCM.post(sender_id, "WalkDone", user);
+                POST2GCM.post(sender_id, "WalkDone", walk_id);
+                Intent i = new Intent(WalkStarted.this, WalkerMain.class);
+                startActivity(i);
             }
 
         }
@@ -471,66 +567,7 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         }
     }
 
-    public class MapPosition extends AsyncTask<String, String, String> {
-        @Override
-        protected String doInBackground(String... args) {
-            String user = args[0];
-            String result = "";
-            InputStream is = null;
-            ArrayList<NameValuePair> nameValuePairs = new ArrayList<>();
-            nameValuePairs.add(new BasicNameValuePair("user", user));
-
-//http post
-            try {
-                HttpClient httpclient = new DefaultHttpClient();
-                HttpPost httppost = new HttpPost("http://leash.ly/webservice/get_data_id.php");
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-                HttpResponse response = httpclient.execute(httppost);
-                HttpEntity entity = response.getEntity();
-                is = entity.getContent();
-            } catch (Exception e) {
-                Log.e("log_tag", "Error in http connection " + e.toString());
-            }
-//convert response to string
-            try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
-                StringBuilder sb = new StringBuilder();
-                String line = null;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line + "\n");
-                }
-                is.close();
-
-                result = sb.toString();
-            } catch (Exception e) {
-                Log.e("log_tag", "Error converting result " + e.toString());
-            }
-
-//parse json data
-            try {
-                JSONArray jArray = new JSONArray(result);
-                JSONObject json_data = null;
-                for (int i = 0; i < jArray.length(); i++) {
-                    json_data = jArray.getJSONObject(i);
-                    Log.i("log_tag", "id: " + json_data.getInt("id") +
-                                    ", name: " + json_data.getString("first_name") +
-                                    ", address_1: " + json_data.getString("address_1") +
-                                    ", address_2: " + json_data.getString("address_2")
-                    );
-                }
-                return json_data.toString();
-            } catch (JSONException e) {
-                Log.e("log_tag", "Error parsing data " + e.toString());
-            }
-
-
-            return null;
-        }
-    }
-
     public class UploadImageClass extends AsyncTask<String, String, Integer> {
-
-        int serverResponseCode = 0;
 
         public Integer doInBackground(String... args) {
             final String fileName = args[0];
@@ -544,6 +581,7 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    Log.d("Executing", "2");
                     new UploadToServer().execute(fileName);
                     //dialog.dismiss();
                 }
@@ -557,7 +595,7 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
             Log.i("result", "" + result);
             Log.d("At dismiss2", "");
             dialog.dismiss();
-            if (walk_fin.getVisibility() == walk_fin.VISIBLE) {
+            if (walk_fin.getVisibility() == View.VISIBLE) {
                 //Animation fadeout = AnimationUtils.loadAnimation(WalkStarted.this, R.anim.fadeout);
                 //walk_fin.startAnimation(fadeout);
                 walk_fin.setVisibility(View.GONE);
@@ -577,13 +615,14 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
 
         @Override
         public void onPostExecute(Integer serverResponse) {
-            new finishActivity().execute();
+
         }
+
 
         public Integer doInBackground(String... args) {
             String fileName = args[0];
-            HttpURLConnection conn = null;
-            DataOutputStream dos = null;
+            HttpURLConnection conn;
+            DataOutputStream dos;
             String lineEnd = "\r\n";
             String twoHyphens = "--";
             String boundary = "*****";
@@ -591,7 +630,7 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
             byte[] buffer;
             int maxBufferSize = 1 * 1024 * 1024;
             File sourceFile = new File(args[0]);
-            while (sourceFile.exists() != true) {
+            while (!sourceFile.exists()) {
                 System.out.println("WAITING...");
             }
 
@@ -602,6 +641,7 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
                 conn.setDoInput(true); // Allow Inputs
                 conn.setDoOutput(true); // Allow Outputs
                 conn.setUseCaches(false); // Don't use a Cached Copy
+                conn.setConnectTimeout(50000);
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Connection", "Keep-Alive");
                 conn.setRequestProperty("ENCTYPE", "multipart/form-data");

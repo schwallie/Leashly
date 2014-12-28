@@ -27,6 +27,7 @@ import java.util.List;
 
 /**
  * Created by schwallie on 12/22/2014.
+ Leashly!
  */
 public class MoreDetails extends ActionBarActivity implements View.OnClickListener {
     private static final String REGISTER_URL = "http://leash.ly/webservice/register_walk_details.php";
@@ -42,7 +43,6 @@ public class MoreDetails extends ActionBarActivity implements View.OnClickListen
     double distance;
     CheckBox dog_1_chk, dog_2_chk, dog_3_chk;
     JSONParser jsonParser = new JSONParser();
-    JSONParser jsonParser_deets = new JSONParser();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +74,7 @@ public class MoreDetails extends ActionBarActivity implements View.OnClickListen
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... args) {
-                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                List<NameValuePair> params = new ArrayList<>();
                 params.add(new BasicNameValuePair("user", sender_id));
                 JSONObject jobj = jsonParser.makeHttpRequest(get_url, "POST", params);
                 //jobj = jobj[sender_id+""];
@@ -127,6 +127,7 @@ public class MoreDetails extends ActionBarActivity implements View.OnClickListen
                     //regid = gcm.register(PROJECT_NUMBER);
                     //msg = "Device registered, registration ID=" + regid;
                     //Log.i("GCM",  msg);
+                    Log.d("newwalk", id_of_insert + "");
                     POST2GCM.post(gcm_id, "NewWalk", id_of_insert);
 
                 } catch (Exception ex) {
@@ -162,7 +163,7 @@ public class MoreDetails extends ActionBarActivity implements View.OnClickListen
                 String dog_1s = "0";
                 String dog_2s = "0";
 
-                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                List<NameValuePair> params = new ArrayList<>();
                 //dog_1_chk.setText(dog_1);
                 if (dog_2.equals("") && dog_3.equals("")) {
                     //dog_1_chk.setClickable(false);
@@ -197,11 +198,10 @@ public class MoreDetails extends ActionBarActivity implements View.OnClickListen
                 params.add(new BasicNameValuePair("dog_1s", dog_1s));
                 params.add(new BasicNameValuePair("dog_2s", dog_2s));
                 params.add(new BasicNameValuePair("route_taken", "0"));
-                params.add(new BasicNameValuePair("map_loc", "0"));
-                params.add(new BasicNameValuePair("img_loc", "0"));
                 params.add(new BasicNameValuePair("addtl_instruct", addtl_instruct.getText().toString()));
                 params.add(new BasicNameValuePair("distance", distance + ""));
                 Log.d("params", params.toString());
+
                 JSONObject json2 = jsonParser.makeHttpRequest(
                         REGISTER_URL, "POST", params);
                 //Log.d("completed",json.toString());

@@ -5,13 +5,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
-/**
- * Created by schwallie on 12/21/2014.
- */
 public class WalkDone extends ActionBarActivity {
-
-    String user;
-
+    String user, id_of_walk;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,10 +16,13 @@ public class WalkDone extends ActionBarActivity {
             setSupportActionBar(toolbar);
 
         }
+
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            user = extras.getString("user");
-            Log.d("ID", user + "");
+            user = extras.getString("id");
+            id_of_walk = extras.getString("sender_id");
+            Log.d("WalkDone ID", user + "");
+            Log.d("WslkDone ID of walk", id_of_walk);
         }
     }
 }
