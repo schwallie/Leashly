@@ -83,6 +83,7 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
     String dte = dateFormat.format(date);
     int REQUEST_IMAGE = 1;
     String save_loc = null;
+    String fileName;
     String dog_1, dog_2, dog_3, note_text;
     Integer camera_done = 0;
     long startTime;
@@ -374,6 +375,7 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
         });
 
     }
+
     @Override
     public void onLocationChanged(Location location) {
         // Report to the UI that the location was
@@ -615,12 +617,13 @@ public class WalkStarted extends ActionBarActivity implements View.OnClickListen
 
         @Override
         public void onPostExecute(Integer serverResponse) {
-
+            File file = new File(fileName);
+            boolean deleted = file.delete();
         }
 
 
         public Integer doInBackground(String... args) {
-            String fileName = args[0];
+            fileName = args[0];
             HttpURLConnection conn;
             DataOutputStream dos;
             String lineEnd = "\r\n";

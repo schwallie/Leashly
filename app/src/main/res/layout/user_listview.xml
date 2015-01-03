@@ -1,85 +1,84 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:orientation="vertical"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
     <include layout="@layout/toolbar" />
 
 
     <android.support.v4.widget.DrawerLayout
-        android:layout_width="match_parent"
         android:id="@+id/drawerLayout"
+        android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <!-- activity view -->
         <RelativeLayout
-            android:layout_width="match_parent" android:layout_height="match_parent"
-            android:id="@+id/listview_front">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@string/sort_by"
-                android:id="@+id/textView2"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="15dp" />
+            android:id="@+id/listview_front"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
             <LinearLayout
-                android:orientation="horizontal"
+                android:id="@+id/linearLayout"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@+id/button"
-                android:layout_toRightOf="@+id/textView2"
-                android:layout_toEndOf="@+id/textView2"
-                android:id="@+id/linearLayout">
+                android:orientation="horizontal">
 
 
                 <Button
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/sortby_distance"
                     android:id="@+id/button"
-                    android:layout_weight="1"
-                    android:background="@null"
-                    android:layout_marginLeft="5dp" />
-
-                <Button
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/sortby_experience"
-                    android:id="@+id/button2"
-                    android:background="@null"
+                    android:layout_marginLeft="5dp"
                     android:layout_weight="1"
-                    android:layout_marginLeft="5dp" />
+                    android:background="@null"
+                    android:capitalize="characters"
+                    android:fontFamily="Roboto"
+                    android:text="@string/sortby_distance"
+                    android:textSize="14sp" />
 
                 <Button
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/sortby_ratings"
                     android:id="@+id/button3"
-                    android:background="@null"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
                     android:layout_weight="1"
-                    android:layout_marginLeft="5dp" />
+                    android:background="@null"
+                    android:capitalize="characters"
+                    android:fontFamily="Roboto"
+                    android:text="@string/sortby_ratings"
+                    android:textSize="14sp" />
+
+                <Button
+                    android:id="@+id/button2"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:capitalize="characters"
+                    android:fontFamily="Roboto"
+                    android:text="HISTORY"
+                    android:textSize="14sp" />
 
             </LinearLayout>
             <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/listview_holder"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:context=".AvailableList"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
                 android:layout_marginTop="30dp"
-                android:id="@+id/listview_holder"
-                android:paddingTop="15dp">
+                android:paddingTop="15dp"
+                tools:context=".AvailableList">
 
-                <ListView
+            <ListView
                     android:id="@+id/list"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
@@ -91,17 +90,17 @@
         </RelativeLayout>
         <!-- navigation drawer -->
         <RelativeLayout
-            android:layout_gravity="left|start"
             android:layout_width="match_parent"
-            android:background="#fff"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_gravity="left|start"
+            android:background="#fff">
 
             <ListView
                 android:id="@+id/left_drawer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:divider="#eee"
                 android:background="#fff"
+                android:divider="#eee"
                 android:dividerHeight="1dp" />
         </RelativeLayout>
 

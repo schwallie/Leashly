@@ -32,9 +32,9 @@
     <string name="Register">Register</string>
     <string name="walker_app_go_active">Go Active</string>
     <string name="sort_by">Sort By:</string>
-    <string name="sortby_distance">Distance</string>
-    <string name="sortby_experience">Experience</string>
-    <string name="sortby_ratings">Ratings</string>
+    <string name="sortby_distance">DISTANCE</string>
+    <string name="sortby_experience">EXPERIENCE</string>
+    <string name="sortby_ratings">RATINGS</string>
     <string name="out_of_5_selected">"(   /5)"</string>
     <string name="ratings_text">5</string>
     <string name="first_name_selected">Chase</string>
