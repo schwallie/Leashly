@@ -7,6 +7,7 @@ package ly.leash.Leashly;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -35,6 +36,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.neokree.materialtabs.MaterialTabHost;
 import ly.leash.Leashly.adapter.CustomListAdapter;
 import ly.leash.Leashly.app.AppController;
 import ly.leash.Leashly.model.viewer;
@@ -50,6 +52,7 @@ public class AvailableList extends ActionBarActivity {
     ArrayAdapter<String> navigationDrawerAdapter;
     String sender_id;
     double distanceInMiles;
+    MaterialTabHost tabHost;
     private ProgressDialog pDialog;
     private List<viewer> movieList = new ArrayList<viewer>();
     private ListView listView;
@@ -65,7 +68,9 @@ public class AvailableList extends ActionBarActivity {
         setContentView(R.layout.user_listview);
         nitView();
         if (toolbar != null) {
-            toolbar.setTitle("Navigation Drawer");
+            //toolbar.setTitle("Leashly");
+            //toolbar.setLogo(R.drawable.icon);
+            toolbar.setTitleTextColor(Color.WHITE);
             setSupportActionBar(toolbar);
         }
         initDrawer();
@@ -81,6 +86,7 @@ public class AvailableList extends ActionBarActivity {
         listView = (ListView) findViewById(R.id.list);
         adapter = new CustomListAdapter(this, movieList);
         listView.setAdapter(adapter);
+
 
         pDialog = new ProgressDialog(this);
         // Showing progress dialog before making http request
@@ -109,7 +115,7 @@ public class AvailableList extends ActionBarActivity {
                                 distanceInMiles = LatLngTool.distance(point1, point2, LengthUnit.MILE);
                                 movie.setTitle(obj.getString("first_name"));
                                 movie.setThumbnailUrl(obj.getString("pic"));
-                                movie.setRating(((String) obj.getString("experience")));
+                                //movie.setRating(((String) obj.getString("experience")));
                                 movie.setYear(Double.parseDouble(String.format("%.2f", distanceInMiles)));
                                 // Genre is json array
                                 /*JSONArray genreArry = obj.getJSONArray("walks");
@@ -170,9 +176,9 @@ public class AvailableList extends ActionBarActivity {
     private void nitView() {
         leftDrawerList = (ListView) findViewById(R.id.left_drawer);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //FIND DRAWERLAYOUT
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         navigationDrawerAdapter = new ArrayAdapter<String>(AvailableList.this, android.R.layout.simple_list_item_1, leftSliderData);
-        Log.d("nsv", navigationDrawerAdapter + "");
         leftDrawerList.setAdapter(navigationDrawerAdapter);
         leftDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
