@@ -9,6 +9,10 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -36,13 +40,15 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.neokree.materialtabs.MaterialTab;
 import it.neokree.materialtabs.MaterialTabHost;
+import it.neokree.materialtabs.MaterialTabListener;
 import ly.leash.Leashly.adapter.CustomListAdapter;
 import ly.leash.Leashly.app.AppController;
 import ly.leash.Leashly.model.viewer;
 
 
-public class AvailableList extends ActionBarActivity {
+public class AvailableList extends ActionBarActivity implements MaterialTabListener {
     // Log tag
     private static final String TAG = AvailableList.class.getSimpleName();
 
@@ -53,6 +59,10 @@ public class AvailableList extends ActionBarActivity {
     String sender_id;
     double distanceInMiles;
     MaterialTabHost tabHost;
+    ViewPager pager;
+    ViewPagerAdapter adapter_page;
+    Double lat = null;
+    Double lon = null;
     private ProgressDialog pDialog;
     private List<viewer> movieList = new ArrayList<viewer>();
     private ListView listView;
@@ -68,27 +78,48 @@ public class AvailableList extends ActionBarActivity {
         setContentView(R.layout.user_listview);
         nitView();
         if (toolbar != null) {
-            //toolbar.setTitle("Leashly");
-            //toolbar.setLogo(R.drawable.icon);
             toolbar.setTitleTextColor(Color.WHITE);
             setSupportActionBar(toolbar);
         }
         initDrawer();
         Bundle extras = getIntent().getExtras();
-        Double lat = null;
-        Double lon = null;
         if (extras != null) {
             lat = extras.getDouble("lat");
             lon = extras.getDouble("lon");
             sender_id = extras.getString("user_id");
             Log.d("Avail_list sender_id", sender_id);
         }
-        listView = (ListView) findViewById(R.id.list);
-        adapter = new CustomListAdapter(this, movieList);
-        listView.setAdapter(adapter);
+        //listView = (ListView) findViewById(R.id.list);
+        //adapter = new CustomListAdapter(this, movieList);
+        //listView.setAdapter(adapter);
 
 
-        pDialog = new ProgressDialog(this);
+        tabHost = (MaterialTabHost) this.findViewById(R.id.tabHost);
+        pager = (ViewPager) this.findViewById(R.id.pager);
+
+        // init view pager
+        adapter_page = new ViewPagerAdapter(getSupportFragmentManager());
+        pager.setAdapter(adapter_page);
+        pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                // when user do a swipe the selected tab change
+                tabHost.setSelectedNavigationItem(position);
+
+            }
+        });
+
+        // insert all tabs from pagerAdapter data
+        for (int i = 0; i < adapter_page.getCount(); i++) {
+            tabHost.addTab(
+                    tabHost.newTab()
+                            .setText(adapter_page.getPageTitle(i))
+                            .setTabListener(this)
+            );
+
+        }
+
+        /*pDialog = new ProgressDialog(this);
         // Showing progress dialog before making http request
         pDialog.setMessage("Loading...");
         pDialog.show();
@@ -118,15 +149,15 @@ public class AvailableList extends ActionBarActivity {
                                 //movie.setRating(((String) obj.getString("experience")));
                                 movie.setYear(Double.parseDouble(String.format("%.2f", distanceInMiles)));
                                 // Genre is json array
-                                /*JSONArray genreArry = obj.getJSONArray("walks");
-                                ArrayList<String> genre = new ArrayList<String>();
-                                for (int j = 0; j < genreArry.length(); j++) {
-                                    genre.add((String) genreArry.get(j));
-                                }
-                                movie.setGenre(genre);*/
+                                //JSONArray genreArry = obj.getJSONArray("walks");
+                                //ArrayList<String> genre = new ArrayList<String>();
+                                //for (int j = 0; j < genreArry.length(); j++) {
+                                //    genre.add((String) genreArry.get(j));
+                                //}
+                                //movie.setGenre(genre);
 
                                 // adding movie to movies array
-                                movieList.add(movie);
+                                //movieList.add(movie);
 
 
                             } catch (JSONException e) {
@@ -170,7 +201,7 @@ public class AvailableList extends ActionBarActivity {
         });
 
         // Adding request to request queue
-        AppController.getInstance().addToRequestQueue(movieReq);
+        AppController.getInstance().addToRequestQueue(movieReq);*/
     }
 
     private void nitView() {
@@ -266,6 +297,134 @@ public class AvailableList extends ActionBarActivity {
             pDialog.dismiss();
             pDialog = null;
         }
+    }
+
+    @Override
+    public void onTabSelected(MaterialTab tab) {
+        pager.setCurrentItem(tab.getPosition());
+        listView = (ListView) findViewById(R.id.list);
+        adapter = new CustomListAdapter(this, movieList);
+        listView.setAdapter(adapter);
+        pDialog = new ProgressDialog(this);
+        // Showing progress dialog before making http request
+        pDialog.setMessage("Loading...");
+        pDialog.show();
+        // Creating volley request obj
+        final Double finalLat = lat;
+        final Double finalLon = lon;
+        final Double finalLat1 = lat;
+        final Double finalLon1 = lon;
+        JsonArrayRequest movieReq = new JsonArrayRequest(url,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(final JSONArray response) {
+                        Log.d(TAG, response.toString());
+                        hidePDialog();
+
+                        // Parsing json
+                        for (int i = 0; i < response.length(); i++) {
+                            try {
+
+                                JSONObject obj = response.getJSONObject(i);
+                                viewer movie = new viewer();
+                                LatLng point1 = new LatLng(obj.getDouble("lat"), obj.getDouble("long"));
+                                LatLng point2 = new LatLng(finalLat, finalLon);
+                                distanceInMiles = LatLngTool.distance(point1, point2, LengthUnit.MILE);
+                                movie.setTitle(obj.getString("first_name"));
+                                movie.setThumbnailUrl(obj.getString("pic"));
+                                //movie.setRating(((String) obj.getString("experience")));
+                                movie.setYear(Double.parseDouble(String.format("%.2f", distanceInMiles)));
+                                // Genre is json array
+                                //JSONArray genreArry = obj.getJSONArray("walks");
+                                //ArrayList<String> genre = new ArrayList<String>();
+                                //for (int j = 0; j < genreArry.length(); j++) {
+                                //    genre.add((String) genreArry.get(j));
+                                //}
+                                //movie.setGenre(genre);
+
+                                // adding movie to movies array
+                                //movieList.add(movie);
+
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                        // notifying list adapter about data changes
+                        // so that it renders the list view with updated data
+                        adapter.notifyDataSetChanged();
+
+                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view,
+                                                    int position, long id) {
+                                String clicked_at = null;
+                                try {
+                                    clicked_at = response.getString(position);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                Intent i = new Intent(getApplicationContext(), full_view_walker.class);
+                                i.putExtra("data", clicked_at);
+                                i.putExtra("lat", finalLat1);
+                                i.putExtra("lon", finalLon1);
+                                i.putExtra("sender_id", sender_id);
+                                startActivity(i);
+
+                            }
+                        });
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.d(TAG, "Error: " + error.getMessage());
+                hidePDialog();
+
+            }
+        });
+
+        // Adding request to request queue
+        AppController.getInstance().addToRequestQueue(movieReq);
+    }
+
+
+    @Override
+    public void onTabReselected(MaterialTab tab) {
+
+    }
+
+    @Override
+    public void onTabUnselected(MaterialTab tab) {
+
+    }
+
+    private class ViewPagerAdapter extends FragmentStatePagerAdapter {
+
+        private String[] lst = {"Distance", "Experience", "History"};
+
+        public ViewPagerAdapter(FragmentManager fm) {
+            super(fm);
+
+        }
+
+        public Fragment getItem(int num) {
+            FragmentText frag = new FragmentText();
+            return frag;
+        }
+
+        @Override
+        public int getCount() {
+            return 3;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return lst[position];
+        }
+
     }
 
 
