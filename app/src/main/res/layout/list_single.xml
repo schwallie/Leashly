@@ -3,45 +3,66 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/list_row_selector"
-    android:padding="5dp" >
+    android:padding="5dp"
+    android:visibility="visible">
     <!-- Thumbnail Image -->
     <com.android.volley.toolbox.NetworkImageView
         android:id="@+id/thumbnail"
         android:layout_width="80dp"
         android:layout_height="80dp"
+        android:layout_alignParentEnd="false"
         android:layout_alignParentLeft="true"
-        android:layout_marginRight="8dp" />
+        android:layout_marginRight="8dp"
+        android:visibility="visible" />
 
     <!-- Movie Title -->
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/thumbnail"
-        android:layout_toRightOf="@+id/thumbnail"
+        android:layout_alignLeft="@+id/imageView"
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/imageView"
+        android:layout_marginLeft="2dp"
+        android:text="Chase"
         android:textSize="@dimen/title"
-        android:textColor="@color/colorPrimary"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:visibility="visible" />
 
     <!-- Rating -->
-    <TextView
-        android:id="@+id/rating"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/title"
-        android:layout_marginTop="1dip"
-        android:layout_toRightOf="@+id/thumbnail"
-        android:textColor="@color/colorPrimary"
-        android:textSize="@dimen/rating"
-        style="@style/Base.TextAppearance.AppCompat.Small" />
 
     <!-- Release Year -->
     <TextView
         android:id="@+id/releaseYear"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentBottom="false"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:textColor="@color/colorPrimary"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="2dp"
+        android:autoText="false"
+        android:text="hello"
         android:textSize="@dimen/year" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="90dp"
+        android:layout_height="30dp"
+        android:layout_below="@+id/title"
+        android:layout_marginLeft="20dp"
+        android:layout_toEndOf="@+id/thumbnail"
+        android:layout_toRightOf="@+id/thumbnail"
+        android:background="@drawable/fivepaws" />
+
+    <TextView
+        android:id="@+id/prev_walks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/imageView"
+        android:layout_alignStart="@+id/imageView"
+        android:layout_below="@+id/imageView"
+        android:layout_marginLeft="2dp"
+        android:text="0 Previous Walks"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 </RelativeLayout>

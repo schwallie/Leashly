@@ -1,8 +1,5 @@
 package ly.leash.Leashly;
 
-/**
- * Created by schwallie on 11/23/2014.
- */
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -25,48 +22,21 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.javadocmd.simplelatlng.LatLng;
-import com.javadocmd.simplelatlng.LatLngTool;
-import com.javadocmd.simplelatlng.util.LengthUnit;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import it.neokree.materialtabs.MaterialTab;
 import it.neokree.materialtabs.MaterialTabHost;
 import it.neokree.materialtabs.MaterialTabListener;
-import ly.leash.Leashly.adapter.CustomListAdapter;
-import ly.leash.Leashly.app.AppController;
-import ly.leash.Leashly.model.viewer;
 
 
 public class AvailableList extends ActionBarActivity implements MaterialTabListener {
-    // Log tag
-    private static final String TAG = AvailableList.class.getSimpleName();
-
-    // Movies json url
-    private static final String url = "http://leash.ly/webservice/get_active.php";
     ListView leftDrawerList;
     ArrayAdapter<String> navigationDrawerAdapter;
     String sender_id;
-    double distanceInMiles;
     MaterialTabHost tabHost;
     ViewPager pager;
     ViewPagerAdapter adapter_page;
     Double lat = null;
     Double lon = null;
     private ProgressDialog pDialog;
-    private List<viewer> movieList = new ArrayList<viewer>();
-    private ListView listView;
-    private CustomListAdapter adapter;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
@@ -89,11 +59,6 @@ public class AvailableList extends ActionBarActivity implements MaterialTabListe
             sender_id = extras.getString("user_id");
             Log.d("Avail_list sender_id", sender_id);
         }
-        //listView = (ListView) findViewById(R.id.list);
-        //adapter = new CustomListAdapter(this, movieList);
-        //listView.setAdapter(adapter);
-
-
         tabHost = (MaterialTabHost) this.findViewById(R.id.tabHost);
         pager = (ViewPager) this.findViewById(R.id.pager);
 
@@ -118,90 +83,6 @@ public class AvailableList extends ActionBarActivity implements MaterialTabListe
             );
 
         }
-
-        /*pDialog = new ProgressDialog(this);
-        // Showing progress dialog before making http request
-        pDialog.setMessage("Loading...");
-        pDialog.show();
-        // Creating volley request obj
-        final Double finalLat = lat;
-        final Double finalLon = lon;
-        final Double finalLat1 = lat;
-        final Double finalLon1 = lon;
-        JsonArrayRequest movieReq = new JsonArrayRequest(url,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(final JSONArray response) {
-                        Log.d(TAG, response.toString());
-                        hidePDialog();
-
-                        // Parsing json
-                        for (int i = 0; i < response.length(); i++) {
-                            try {
-
-                                JSONObject obj = response.getJSONObject(i);
-                                viewer movie = new viewer();
-                                LatLng point1 = new LatLng(obj.getDouble("lat"), obj.getDouble("long"));
-                                LatLng point2 = new LatLng(finalLat, finalLon);
-                                distanceInMiles = LatLngTool.distance(point1, point2, LengthUnit.MILE);
-                                movie.setTitle(obj.getString("first_name"));
-                                movie.setThumbnailUrl(obj.getString("pic"));
-                                //movie.setRating(((String) obj.getString("experience")));
-                                movie.setYear(Double.parseDouble(String.format("%.2f", distanceInMiles)));
-                                // Genre is json array
-                                //JSONArray genreArry = obj.getJSONArray("walks");
-                                //ArrayList<String> genre = new ArrayList<String>();
-                                //for (int j = 0; j < genreArry.length(); j++) {
-                                //    genre.add((String) genreArry.get(j));
-                                //}
-                                //movie.setGenre(genre);
-
-                                // adding movie to movies array
-                                //movieList.add(movie);
-
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-
-                        // notifying list adapter about data changes
-                        // so that it renders the list view with updated data
-                        adapter.notifyDataSetChanged();
-
-                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> parent, View view,
-                                                    int position, long id) {
-                                String clicked_at = null;
-                                try {
-                                    clicked_at = response.getString(position);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                                Intent i = new Intent(getApplicationContext(), full_view_walker.class);
-                                i.putExtra("data", clicked_at);
-                                i.putExtra("lat", finalLat1);
-                                i.putExtra("lon", finalLon1);
-                                i.putExtra("sender_id", sender_id);
-                                startActivity(i);
-
-                            }
-                        });
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                VolleyLog.d(TAG, "Error: " + error.getMessage());
-                hidePDialog();
-
-            }
-        });
-
-        // Adding request to request queue
-        AppController.getInstance().addToRequestQueue(movieReq);*/
     }
 
     private void nitView() {
@@ -209,7 +90,7 @@ public class AvailableList extends ActionBarActivity implements MaterialTabListe
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         //FIND DRAWERLAYOUT
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-        navigationDrawerAdapter = new ArrayAdapter<String>(AvailableList.this, android.R.layout.simple_list_item_1, leftSliderData);
+        navigationDrawerAdapter = new ArrayAdapter<>(AvailableList.this, android.R.layout.simple_list_item_1, leftSliderData);
         leftDrawerList.setAdapter(navigationDrawerAdapter);
         leftDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -280,10 +161,7 @@ public class AvailableList extends ActionBarActivity implements MaterialTabListe
         if (id == R.id.action_settings) {
             return true;
         }
-        if (drawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+        return drawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -302,92 +180,6 @@ public class AvailableList extends ActionBarActivity implements MaterialTabListe
     @Override
     public void onTabSelected(MaterialTab tab) {
         pager.setCurrentItem(tab.getPosition());
-        listView = (ListView) findViewById(R.id.list);
-        adapter = new CustomListAdapter(this, movieList);
-        listView.setAdapter(adapter);
-        pDialog = new ProgressDialog(this);
-        // Showing progress dialog before making http request
-        pDialog.setMessage("Loading...");
-        pDialog.show();
-        // Creating volley request obj
-        final Double finalLat = lat;
-        final Double finalLon = lon;
-        final Double finalLat1 = lat;
-        final Double finalLon1 = lon;
-        JsonArrayRequest movieReq = new JsonArrayRequest(url,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(final JSONArray response) {
-                        Log.d(TAG, response.toString());
-                        hidePDialog();
-
-                        // Parsing json
-                        for (int i = 0; i < response.length(); i++) {
-                            try {
-
-                                JSONObject obj = response.getJSONObject(i);
-                                viewer movie = new viewer();
-                                LatLng point1 = new LatLng(obj.getDouble("lat"), obj.getDouble("long"));
-                                LatLng point2 = new LatLng(finalLat, finalLon);
-                                distanceInMiles = LatLngTool.distance(point1, point2, LengthUnit.MILE);
-                                movie.setTitle(obj.getString("first_name"));
-                                movie.setThumbnailUrl(obj.getString("pic"));
-                                //movie.setRating(((String) obj.getString("experience")));
-                                movie.setYear(Double.parseDouble(String.format("%.2f", distanceInMiles)));
-                                // Genre is json array
-                                //JSONArray genreArry = obj.getJSONArray("walks");
-                                //ArrayList<String> genre = new ArrayList<String>();
-                                //for (int j = 0; j < genreArry.length(); j++) {
-                                //    genre.add((String) genreArry.get(j));
-                                //}
-                                //movie.setGenre(genre);
-
-                                // adding movie to movies array
-                                //movieList.add(movie);
-
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-
-                        // notifying list adapter about data changes
-                        // so that it renders the list view with updated data
-                        adapter.notifyDataSetChanged();
-
-                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> parent, View view,
-                                                    int position, long id) {
-                                String clicked_at = null;
-                                try {
-                                    clicked_at = response.getString(position);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                                Intent i = new Intent(getApplicationContext(), full_view_walker.class);
-                                i.putExtra("data", clicked_at);
-                                i.putExtra("lat", finalLat1);
-                                i.putExtra("lon", finalLon1);
-                                i.putExtra("sender_id", sender_id);
-                                startActivity(i);
-
-                            }
-                        });
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                VolleyLog.d(TAG, "Error: " + error.getMessage());
-                hidePDialog();
-
-            }
-        });
-
-        // Adding request to request queue
-        AppController.getInstance().addToRequestQueue(movieReq);
     }
 
 
@@ -411,7 +203,13 @@ public class AvailableList extends ActionBarActivity implements MaterialTabListe
         }
 
         public Fragment getItem(int num) {
+            Bundle args = new Bundle();
+            args.putDouble("lat", lat);
+            args.putDouble("lon", lon);
+            args.putInt("sort", num);
             FragmentText frag = new FragmentText();
+            frag.setArguments(args);
+
             return frag;
         }
 

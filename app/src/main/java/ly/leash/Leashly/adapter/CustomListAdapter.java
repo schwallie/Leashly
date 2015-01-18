@@ -1,13 +1,5 @@
 package ly.leash.Leashly.adapter;
 
-/**
- * Created by schwallie on 11/24/2014.
- */
-import ly.leash.Leashly.R;
-import ly.leash.Leashly.app.AppController;
-import ly.leash.Leashly.model.viewer;
-
-import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
@@ -20,11 +12,17 @@ import android.widget.TextView;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 
+import java.util.List;
+
+import ly.leash.Leashly.R;
+import ly.leash.Leashly.app.AppController;
+import ly.leash.Leashly.model.viewer;
+
 public class CustomListAdapter extends BaseAdapter {
+    ImageLoader imageLoader = AppController.getInstance().getImageLoader();
     private Activity activity;
     private LayoutInflater inflater;
     private List<viewer> movieItems;
-    ImageLoader imageLoader = AppController.getInstance().getImageLoader();
 
     public CustomListAdapter(Activity activity, List<viewer> movieItems) {
         this.activity = activity;
@@ -60,7 +58,7 @@ public class CustomListAdapter extends BaseAdapter {
         NetworkImageView thumbNail = (NetworkImageView) convertView
                 .findViewById(R.id.thumbnail);
         TextView title = (TextView) convertView.findViewById(R.id.title);
-        TextView rating = (TextView) convertView.findViewById(R.id.rating);
+        //TextView rating = (TextView) convertView.findViewById(R.id.rating);
         TextView year = (TextView) convertView.findViewById(R.id.releaseYear);
 
         // getting movie data for the row
@@ -72,20 +70,7 @@ public class CustomListAdapter extends BaseAdapter {
         // title
         title.setText(m.getTitle());
 
-        // rating
-        rating.setText("Exp: " + String.valueOf(m.getRating()));
-
-        // genre
-        String genreStr = "";
-        /*for (String str : m.getGenre()) {
-            genreStr += str + ", ";
-        }
-        genreStr = genreStr.length() > 0 ? genreStr.substring(0,
-                genreStr.length() - 2) : genreStr;
-        genre.setText(genreStr);*/
-
-        // release year
-        year.setText("Distance: " + String.valueOf(m.getYear()) + " miles");
+        year.setText(String.valueOf(m.getYear()) + " mi");
 
         return convertView;
     }
