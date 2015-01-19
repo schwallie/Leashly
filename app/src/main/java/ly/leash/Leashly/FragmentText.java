@@ -42,7 +42,6 @@ public class FragmentText extends Fragment {
     private List<viewer> movieList = new ArrayList<>();
     private ListView listView;
     private CustomListAdapter adapter;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +52,17 @@ public class FragmentText extends Fragment {
 
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(TAG, "Started");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "Resumed");
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View V = inflater.inflate(R.layout.front_list, container, false);
