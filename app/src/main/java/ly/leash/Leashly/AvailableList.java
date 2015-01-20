@@ -197,6 +197,7 @@ public class AvailableList extends ActionBarActivity implements MaterialTabListe
         args.putDouble("lat", lat);
         args.putDouble("lon", lon);
         args.putInt("sort", tab.getPosition());
+        Log.d("Sort", tab.getPosition() + "");
         FragmentText frag = new FragmentText();
         frag.setArguments(args);
         pager.setCurrentItem(tab.getPosition());
@@ -220,19 +221,10 @@ public class AvailableList extends ActionBarActivity implements MaterialTabListe
 
         public ViewPagerAdapter(FragmentManager fm) {
             super(fm);
-            Log.d("1", "3");
         }
 
         public Fragment getItem(int num) {
-            Bundle args = new Bundle();
-            args.putDouble("lat", lat);
-            args.putDouble("lon", lon);
-            args.putInt("sort", num);
-            Log.d("sort1", num + "");
-            FragmentText frag = new FragmentText();
-            frag.setArguments(args);
-
-            return frag;
+            return FragmentText.newInstance(num);
         }
 
         @Override

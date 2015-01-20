@@ -31,6 +31,8 @@ import ly.leash.Leashly.app.AppController;
 import ly.leash.Leashly.model.viewer;
 
 public class FragmentText extends Fragment {
+    // In the FragmentText
+    public static final String EXTRA_POSITION = "extra_position";
     // Log tag
     private static final String TAG = AvailableList.class.getSimpleName();
     private static final String url = "http://leash.ly/webservice/get_active.php";
@@ -42,9 +44,20 @@ public class FragmentText extends Fragment {
     private List<viewer> movieList = new ArrayList<>();
     private ListView listView;
     private CustomListAdapter adapter;
+
+    public static Fragment newInstance(int position) {
+        FragmentText ft = new FragmentText();
+        Bundle args = new Bundle();
+        Log.d("FText", position + "");
+        args.putInt(EXTRA_POSITION, position);
+        ft.setArguments(args); // set the arguments with the tab position
+        return ft;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        int identifier = getArguments().getInt(EXTRA_POSITION);
         lon = getArguments().getDouble("lon");
         lat = getArguments().getDouble("lat");
         sort = getArguments().getInt("sort");
