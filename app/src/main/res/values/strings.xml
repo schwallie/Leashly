@@ -1,5 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="dismiss">Dismiss</string>
+    <string name="basic_notitle">Basic (No Title)</string>
+    <string name="shareLocationPrompt">This app wants to access your location.</string>
+    <string name="basic_list_long">Basic Long List</string>
+    <string name="states">States</string>
+    <string name="custom_listitem_button">A button!</string>
+    <string name="custom_adapter">Custom Adapter</string>
+    <string name="loremIpsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vitae metus nec sapien elementum interdum ac mollis tortor. Nunc porttitor metus placerat orci auctor, sed dictum magna dapibus. Morbi a lacus ante. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Proin posuere nisl imperdiet lectus elementum accumsan. Etiam lacinia nisi ut nulla fermentum tempus. Integer ornare lacinia diam non maximus. Vestibulum iaculis urna eu elementum scelerisque. Etiam nisl erat, bibendum vitae magna nec, convallis malesuada erat. Cras non porttitor nibh. Pellentesque rhoncus sem luctus felis tincidunt bibendum. Pellentesque vulputate eros at nulla sollicitudin volutpat. Pellentesque laoreet est sit amet erat laoreet, id molestie nulla efficitur. Interdum et malesuada fames ac ante ipsum primis in faucibus. Sed varius nisl at imperdiet facilisis.</string>
+    <string name="basic_longContent">Basic (Long Content)</string>
+    <string name="basic_icon">Basic (Icon)</string>
+    <string name="basic_list_notitle">Basic List (No Title)</string>
+    <string name="folder_chooser">Folder Chooser</string>
+    <string name="showCancelDismissCallbacks">Show/Cancel/Dismiss Callbacks</string>
+    <string name="changelog">Changelog</string>
+    <string name="customView_webView">Custom View No Scroll #1</string>
+    <string name="customView_colorChooser">Custom View No Scroll #2</string>
+    <string name="ssid">SSID</string>
+    <string name="ssidLit">Material Dialogs</string>
+    <string name="color_chooser">Color Chooser</string>
+
+    <string name="agree">Agree</string>
+    <string name="disagree">Disagree</string>
+    <string name="more_info">More Info</string>
+
+    <string name="basic">Basic</string>
+    <string name="stacked">Stacked Buttons</string>
+    <string name="neutral">Neutral Button</string>
+    <string name="callbacks">Callbacks</string>
+    <string name="list">Basic List</string>
+    <string name="singleChoice">Single Choice</string>
+    <string name="multiChoice">Multi Choice</string>
+    <string name="customView">Custom View</string>
+    <string name="themed">Themed</string>
+    <string name="signalStrength">Signal strength</string>
+    <string name="excellent">Excellent</string>
+    <string name="security">Security</string>
+    <string name="securityType">802.1x EAP</string>
+    <string name="showPassword">Show password</string>
+    <string name="useGoogleLocationServices">Use Google\'s Location Services?</string>
+    <string name="useGoogleLocationServicesPrompt">Let Google help apps determine location. This means sending anonymous location data to Google, even when no apps are running.</string>
+    <string name="socialNetworks">Social Networks</string>
+    <string name="choose">Choose</string>
+    <string name="speedBoost">Turn on speed boost now!</string>
+    <string name="noThanks">No thanks</string>
+    <string name="googleWifi">Google Wifi</string>
+    <string name="connect">Connect</string>
+
 
     <string name="app_name">Leashly</string>
     <string name="action_settings">Settings</string>

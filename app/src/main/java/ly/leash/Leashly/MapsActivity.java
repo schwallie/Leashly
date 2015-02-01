@@ -1,7 +1,7 @@
 package ly.leash.Leashly;
+
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -9,7 +9,6 @@ import android.util.Log;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -109,21 +108,21 @@ public class MapsActivity extends ActionBarActivity {
         Log.d("data", data);
         double lat, longitude;
         String dog = "";
-        try{
+        try {
             JSONObject jobj = new JSONObject(data);
             lat = jobj.getDouble("lat");
             longitude = jobj.getDouble("long");
             dog += jobj.getString("dog_1");
-            if(!jobj.getString("dog_2").equals("")) {
+            if (!jobj.getString("dog_2").equals("")) {
                 dog += " & ";
             }
             dog += jobj.getString("dog_2");
-            if(!jobj.getString("dog_3").equals("")) {
+            if (!jobj.getString("dog_3").equals("")) {
                 dog += " & ";
             }
             dog += jobj.getString("dog_3");
 
-        } catch(JSONException e){
+        } catch (JSONException e) {
             dog = "";
             lat = 0.0;
             longitude = 0.0;
@@ -133,7 +132,8 @@ public class MapsActivity extends ActionBarActivity {
         Log.d("dog_1", dog.getClass().toString());
         mMap.setMyLocationEnabled(false); // false to disable
         MarkerOptions marker = new MarkerOptions().position(new LatLng(lat, longitude)).title(dog);
-        marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.doghouse));
+        //
+        // marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.doghouse));
         final Marker marker_new = mMap.addMarker(marker);
         marker_new.showInfoWindow();
         mMap.getUiSettings().setZoomControlsEnabled(false);
@@ -143,6 +143,7 @@ public class MapsActivity extends ActionBarActivity {
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
     }
+
     public class MapPosition extends AsyncTask<String, String, String> {
 
 
@@ -155,19 +156,19 @@ public class MapsActivity extends ActionBarActivity {
             nameValuePairs.add(new BasicNameValuePair("user", user));
 
 //http post
-            try{
+            try {
                 HttpClient httpclient = new DefaultHttpClient();
                 HttpPost httppost = new HttpPost("http://leash.ly/webservice/get_data.php");
                 httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
                 HttpResponse response = httpclient.execute(httppost);
                 HttpEntity entity = response.getEntity();
                 is = entity.getContent();
-            }catch(Exception e){
-                Log.e("log_tag", "Error in http connection "+e.toString());
+            } catch (Exception e) {
+                Log.e("log_tag", "Error in http connection " + e.toString());
             }
 //convert response to string
-            try{
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is,"iso-8859-1"),8);
+            try {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
                 StringBuilder sb = new StringBuilder();
                 String line = null;
                 while ((line = reader.readLine()) != null) {
@@ -175,30 +176,27 @@ public class MapsActivity extends ActionBarActivity {
                 }
                 is.close();
 
-                result=sb.toString();
-            }catch(Exception e){
-                Log.e("log_tag", "Error converting result "+e.toString());
+                result = sb.toString();
+            } catch (Exception e) {
+                Log.e("log_tag", "Error converting result " + e.toString());
             }
 
 //parse json data
-            try{
+            try {
                 JSONArray jArray = new JSONArray(result);
                 JSONObject json_data = null;
-                for(int i=0;i<jArray.length();i++){
+                for (int i = 0; i < jArray.length(); i++) {
                     json_data = jArray.getJSONObject(i);
-                    Log.i("log_tag","id: "+json_data.getInt("id")+
-                                    ", name: "+json_data.getString("first_name")+
-                                    ", address_1: "+json_data.getString("address_1")+
-                                    ", address_2: "+json_data.getString("address_2")
+                    Log.i("log_tag", "id: " + json_data.getInt("id") +
+                                    ", name: " + json_data.getString("first_name") +
+                                    ", address_1: " + json_data.getString("address_1") +
+                                    ", address_2: " + json_data.getString("address_2")
                     );
                 }
                 return json_data.toString();
+            } catch (JSONException e) {
+                Log.e("log_tag", "Error parsing data " + e.toString());
             }
-            catch(JSONException e){
-                Log.e("log_tag", "Error parsing data "+e.toString());
-            }
-
-
 
 
             return null;

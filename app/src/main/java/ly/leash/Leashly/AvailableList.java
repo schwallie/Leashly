@@ -8,13 +8,12 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,15 +21,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import it.neokree.materialtabs.MaterialTab;
 import it.neokree.materialtabs.MaterialTabHost;
 import it.neokree.materialtabs.MaterialTabListener;
-import ly.leash.Leashly.adapter.CustomListAdapter;
-import ly.leash.Leashly.model.viewer;
-
 
 public class AvailableList extends ActionBarActivity implements MaterialTabListener {
     private static final String TAG = AvailableList.class.getSimpleName();
@@ -40,19 +33,14 @@ public class AvailableList extends ActionBarActivity implements MaterialTabListe
     MaterialTabHost tabHost;
     ViewPager pager;
     ViewPagerAdapter adapter_page;
-    String sender_id;
-    double distanceInMiles;
+    String sender_id, dog_1, dog_2, dog_3;
     Double lat = null;
     Double lon = null;
-    Integer sort;
     private ProgressDialog pDialog;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private String[] leftSliderData = {"Logout", "Contact Us"};
-    private List<viewer> movieList = new ArrayList<>();
-    private ListView listView;
-    private CustomListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +57,9 @@ public class AvailableList extends ActionBarActivity implements MaterialTabListe
             lat = extras.getDouble("lat");
             lon = extras.getDouble("lon");
             sender_id = extras.getString("user_id");
-            Log.d("Avail_list sender_id", sender_id);
+            dog_1 = extras.getString("dog_1");
+            dog_2 = extras.getString("dog_2");
+            dog_3 = extras.getString("dog_3");
         }
         tabHost = (MaterialTabHost) this.findViewById(R.id.tabHost);
         pager = (ViewPager) this.findViewById(R.id.pager);
@@ -81,7 +71,6 @@ public class AvailableList extends ActionBarActivity implements MaterialTabListe
             @Override
             public void onPageSelected(int position) {
                 // when user do a swipe the selected tab change
-                Log.d("1", "5");
                 tabHost.setSelectedNavigationItem(position);
 
             }
@@ -192,21 +181,12 @@ public class AvailableList extends ActionBarActivity implements MaterialTabListe
 
     @Override
     public void onTabSelected(MaterialTab tab) {
-        Log.d("1", "1");
-        Bundle args = new Bundle();
-        args.putDouble("lat", lat);
-        args.putDouble("lon", lon);
-        args.putInt("sort", tab.getPosition());
-        Log.d("Sort", tab.getPosition() + "");
-        FragmentText frag = new FragmentText();
-        frag.setArguments(args);
         pager.setCurrentItem(tab.getPosition());
     }
 
 
     @Override
     public void onTabReselected(MaterialTab tab) {
-        Log.d("2", "2");
         pager.setCurrentItem(tab.getPosition());
     }
 
@@ -215,16 +195,16 @@ public class AvailableList extends ActionBarActivity implements MaterialTabListe
 
     }
 
-    private class ViewPagerAdapter extends FragmentPagerAdapter {
+    private class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
-        private String[] lst = {"Distance", "Experience", "History"};
+        private String[] lst = {"Distance", "Previous Walks", "Ratings"};
 
         public ViewPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
         public Fragment getItem(int num) {
-            return FragmentText.newInstance(num);
+            return FragmentText.newInstance(num, lat, lon, dog_1, dog_2, dog_3, sender_id);
         }
 
         @Override
@@ -234,7 +214,6 @@ public class AvailableList extends ActionBarActivity implements MaterialTabListe
 
         @Override
         public CharSequence getPageTitle(int position) {
-            Log.d("1", "4");
             return lst[position];
         }
 

@@ -1,6 +1,5 @@
 package ly.leash.Leashly;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -23,10 +22,9 @@ import java.util.Arrays;
  * Created by schwallie on 11/18/2014.
  */
 public class WalkerMain extends ActionBarActivity implements View.OnClickListener {
-    private Button mActive;
     public String user = null;
-    public Integer user_id = 0;
-
+    public String user_id;
+    private Button mActive;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
@@ -47,7 +45,7 @@ public class WalkerMain extends ActionBarActivity implements View.OnClickListene
 
         if (extras != null) {
             user = extras.getString("user");
-            user_id = extras.getInt("user_id");
+            user_id = extras.getString("user_id");
             Log.d("In WalkerMain!", user);
         }
         mActive = (Button) findViewById(R.id.go_active);

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <include layout="@layout/toolbar" />
+
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawerLayout_progress"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false">
+
+        <RelativeLayout
+            android:id="@+id/activity_progress"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/switcher_accept"
+                android:layout_alignStart="@id/switcher_accept"
+                android:layout_alignTop="@+id/switcher_accept"
+                android:layout_marginLeft="60dp"
+                android:layout_marginTop="10dp"
+                android:text="Pending Acceptance"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/textView2"
+                android:layout_alignStart="@+id/textView2"
+                android:layout_below="@+id/textView2"
+                android:layout_marginTop="32dp"
+                android:text="Walker on the way"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/textView12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/textView11"
+                android:layout_alignStart="@+id/textView11"
+                android:layout_below="@+id/textView11"
+                android:layout_marginTop="32dp"
+                android:text="Walk In Progress"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/textView13"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/textView12"
+                android:layout_alignStart="@+id/textView12"
+                android:layout_below="@+id/textView12"
+                android:layout_marginTop="32dp"
+                android:text="Walk Finished"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <ImageSwitcher
+                android:id="@+id/switcher_accept"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp"
+                android:layout_marginTop="24dp"
+                android:animateFirstView="false" />
+
+            <ImageSwitcher
+                android:id="@+id/switcher_on_way"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/switcher_accept"
+                android:layout_alignStart="@+id/switcher_accept"
+                android:layout_alignTop="@+id/textView11" />
+
+            <ImageSwitcher
+                android:id="@+id/switcher_in_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/switcher_on_way"
+                android:layout_alignStart="@+id/switcher_on_way"
+                android:layout_alignTop="@+id/textView12" />
+
+            <ImageSwitcher
+                android:id="@+id/switcher_finished"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/switcher_in_progress"
+                android:layout_alignStart="@+id/switcher_in_progress"
+                android:layout_alignTop="@+id/textView13" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/drawer_progress"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="left|start"
+            android:background="#fff">
+
+            <ListView
+                android:id="@+id/left_drawer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#fff"
+                android:divider="#eee"
+                android:dividerHeight="1dp" />
+        </RelativeLayout>
+    </android.support.v4.widget.DrawerLayout>
+</LinearLayout>

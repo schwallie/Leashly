@@ -92,6 +92,7 @@ public class GcmIntentService extends IntentService {
         if (title.contains("New")) {
             notificationIntent = new Intent(this, WalkerRequest.class);
         } else if (title.contains("Accepted")) {
+
             notificationIntent = new Intent(this, WalkInProgress.class);
         } else {
             notificationIntent = new Intent(this, WalkDone.class);

@@ -32,7 +32,7 @@ public class LoginStartup extends AsyncTask<String, Void, Void> {
     private final Context context;
     String username;
     GoogleCloudMessaging gcm;
-    String regid;
+    String regid, dog_1, dog_2, dog_3;
     String PROJECT_NUMBER = "621850944390";
 
     public LoginStartup(String username, Context context) {
@@ -99,6 +99,9 @@ public class LoginStartup extends AsyncTask<String, Void, Void> {
             user_id = jobj.getInt("id");
             lat = jobj.getDouble("lat");
             lon = jobj.getDouble("long");
+            dog_1 = jobj.getString("dog_1");
+            dog_2 = jobj.getString("dog_2");
+            dog_3 = jobj.getString("dog_3");
             registerId(user_id);
 
 
@@ -114,6 +117,9 @@ public class LoginStartup extends AsyncTask<String, Void, Void> {
                 i.putExtra("user_id", user_id + "");
                 i.putExtra("lat", lat);
                 i.putExtra("lon", lon);
+                i.putExtra("dog_1", dog_1);
+                i.putExtra("dog_2", dog_2);
+                i.putExtra("dog_3", dog_3);
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(i);
             } else {

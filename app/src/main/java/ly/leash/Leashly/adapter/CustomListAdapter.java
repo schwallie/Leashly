@@ -60,7 +60,7 @@ public class CustomListAdapter extends BaseAdapter {
         TextView title = (TextView) convertView.findViewById(R.id.title);
         //TextView rating = (TextView) convertView.findViewById(R.id.rating);
         TextView year = (TextView) convertView.findViewById(R.id.releaseYear);
-
+        TextView walks = (TextView) convertView.findViewById(R.id.prev_walks);
         // getting movie data for the row
         viewer m = movieItems.get(position);
 
@@ -71,7 +71,7 @@ public class CustomListAdapter extends BaseAdapter {
         title.setText(m.getTitle());
 
         year.setText(String.valueOf(m.getYear()) + " mi");
-
+        walks.setText(m.getRating() + " Previous Walks");
         return convertView;
     }
 

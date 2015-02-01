@@ -1,4 +1,5 @@
 package ly.leash.Leashly;
+
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -22,22 +23,17 @@ import java.util.List;
 
 public class Login extends ActionBarActivity implements OnClickListener {
 
-    private EditText user, pass;
-    private Button mSubmit, mRegister;
-
-
-    // Progress Dialog
-    private ProgressDialog pDialog;
-
-    // JSON parser class
-    JSONParser jsonParser = new JSONParser();
-
     // testing on Emulator:
     private static final String LOGIN_URL = "http://leash.ly/webservice/login.php";
-
     // JSON element ids from repsonse of php script:
     private static final String TAG_SUCCESS = "success";
     private static final String TAG_MESSAGE = "message";
+    // JSON parser class
+    JSONParser jsonParser = new JSONParser();
+    private EditText user, pass;
+    private Button mSubmit, mRegister;
+    // Progress Dialog
+    private ProgressDialog pDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +52,7 @@ public class Login extends ActionBarActivity implements OnClickListener {
         }
         // setup input fields
         user = (EditText) findViewById(R.id.username);
-        pass = (EditText) findViewById(R.id.password);
+        pass = (EditText) findViewById(R.id.extra);
 
         // setup buttons
         mSubmit = (Button) findViewById(R.id.login);
@@ -86,75 +82,73 @@ public class Login extends ActionBarActivity implements OnClickListener {
     }
 
 
-
-
     class AttemptLogin extends AsyncTask<String, String, String> {
 
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                pDialog = new ProgressDialog(Login.this);
-                pDialog.setMessage("Attempting login...");
-                pDialog.setIndeterminate(false);
-                pDialog.setCancelable(true);
-                pDialog.show();
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(Login.this);
+            pDialog.setMessage("Attempting login...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(true);
+            pDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... args) {
+            // TODO Auto-generated method stub
+            // Check for success tag
+            int success;
+            String username = user.getText().toString();
+            String password = pass.getText().toString();
+            try {
+                // Building Parameters
+                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                params.add(new BasicNameValuePair("username", username));
+                params.add(new BasicNameValuePair("password", password));
+
+                Log.d("request!", "starting");
+                // getting product details by making HTTP request
+                JSONObject json = jsonParser.makeHttpRequest(LOGIN_URL, "POST",
+                        params);
+
+                // check your log for json response
+                Log.d("Login attempt", json.toString());
+
+                // json success tag
+                success = json.getInt(TAG_SUCCESS);
+                if (success == 1) {
+                    Log.d("Login Successful!", json.toString());
+                    // save user data
+
+                    PreferenceData.setUserLoggedInStatus(getBaseContext(), true);
+                    PreferenceData.setLoggedInUserEmail(getBaseContext(), username);
+                    LoginStartup userdata = new LoginStartup(username, getApplicationContext());
+                    userdata.execute(username);
+
+                } else {
+                    Log.d("Login Failure!", json.getString(TAG_MESSAGE));
+                    return json.getString(TAG_MESSAGE);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
 
-            @Override
-            protected String doInBackground(String... args) {
-                // TODO Auto-generated method stub
-                // Check for success tag
-                int success;
-                String username = user.getText().toString();
-                String password = pass.getText().toString();
-                try {
-                    // Building Parameters
-                    List<NameValuePair> params = new ArrayList<NameValuePair>();
-                    params.add(new BasicNameValuePair("username", username));
-                    params.add(new BasicNameValuePair("password", password));
+            return null;
 
-                    Log.d("request!", "starting");
-                    // getting product details by making HTTP request
-                    JSONObject json = jsonParser.makeHttpRequest(LOGIN_URL, "POST",
-                            params);
-
-                    // check your log for json response
-                    Log.d("Login attempt", json.toString());
-
-                    // json success tag
-                    success = json.getInt(TAG_SUCCESS);
-                    if (success == 1) {
-                        Log.d("Login Successful!", json.toString());
-                        // save user data
-
-                        PreferenceData.setUserLoggedInStatus(getBaseContext(), true);
-                        PreferenceData.setLoggedInUserEmail(getBaseContext(), username);
-                        LoginStartup userdata = new LoginStartup(username, getApplicationContext());
-                        userdata.execute(username);
-
-                    } else {
-                        Log.d("Login Failure!", json.getString(TAG_MESSAGE));
-                        return json.getString(TAG_MESSAGE);
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                return null;
-
-            }
+        }
 
 
-            protected void onPostExecute(String file_url) {
-                // dismiss the dialog once product deleted
-                pDialog.dismiss();
-                if (file_url != null) {
-                    Toast.makeText(Login.this, file_url, Toast.LENGTH_LONG).show();
-                }
-
+        protected void onPostExecute(String file_url) {
+            // dismiss the dialog once product deleted
+            pDialog.dismiss();
+            if (file_url != null) {
+                Toast.makeText(Login.this, file_url, Toast.LENGTH_LONG).show();
             }
 
         }
 
     }
+
+}
 
