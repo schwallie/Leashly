@@ -1,6 +1,9 @@
 package ly.leash.Leashly;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -35,16 +38,26 @@ public class WalkInProgress extends ActionBarActivity implements ViewSwitcher.Vi
     String user;
     ListView leftDrawerList;
     ArrayAdapter<String> navigationDrawerAdapter;
-    Animation aniIn = AnimationUtils.loadAnimation(this,
-            android.R.anim.fade_in);
-    Animation aniOut = AnimationUtils.loadAnimation(this,
-            android.R.anim.fade_out);
+    Animation aniIn;
+    Animation aniOut;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private String[] leftSliderData = {"Logout", "Contact Us"};
     private int index = 0;
-    private boolean isRunning = true;
+    private boolean isRunning = false;
+    /* this handler will process the broadcast intent */
+    private BroadcastReceiver messageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            // Extract data included in the Intent
+            Integer message = intent.getIntExtra("message", 0);
+            System.out.println(message + "");
+            startAnimatedBackground(message);
+            // you could start your animation here
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,12 +69,14 @@ public class WalkInProgress extends ActionBarActivity implements ViewSwitcher.Vi
             setSupportActionBar(toolbar);
         }
         initDrawer();
-        startAnimatedBackground(0);
+        Integer starter = 0;
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             user = extras.getString("user");
             Log.d("ID", user + "");
+            starter = extras.getInt("animate");
         }
+        startAnimatedBackground(starter);
     }
 
     private void nitView() {
@@ -96,6 +111,18 @@ public class WalkInProgress extends ActionBarActivity implements ViewSwitcher.Vi
 
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        this.registerReceiver(messageReceiver, new IntentFilter("Animate"));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        this.unregisterReceiver(messageReceiver);
     }
 
     private void initDrawer() {
@@ -147,31 +174,44 @@ public class WalkInProgress extends ActionBarActivity implements ViewSwitcher.Vi
         return super.onOptionsItemSelected(item);
     }
 
-    private void startAnimatedBackground(Integer num) {
+    public void startAnimatedBackground(Integer num) {
+        ImageSwitcher imageSwitcher = null;
+        aniIn = AnimationUtils.loadAnimation(this,
+                android.R.anim.fade_in);
+        aniOut = AnimationUtils.loadAnimation(this,
+                android.R.anim.fade_out);
+
         aniIn.setDuration(500);
         aniOut.setDuration(500);
-        ImageSwitcher imageSwitcher = null;
         switch (num) {
             case 0:
                 imageSwitcher = (ImageSwitcher) findViewById(R.id.switcher_accept);
                 break;
             case 1:
+                ImageView accept = (ImageView) findViewById(R.id.accept_finish);
+                accept.setVisibility(View.VISIBLE);
+                ImageView on_way_starter = (ImageView) findViewById(R.id.on_way_starter);
+                on_way_starter.setVisibility(View.INVISIBLE);
                 imageSwitcher = (ImageSwitcher) findViewById(R.id.switcher_on_way);
                 break;
             case 2:
+                ImageView on_way = (ImageView) findViewById(R.id.on_way_finish);
+                on_way.setVisibility(View.VISIBLE);
+                ImageView in_progress_starter = (ImageView) findViewById(R.id.in_progress_starter);
+                in_progress_starter.setVisibility(View.INVISIBLE);
                 imageSwitcher = (ImageSwitcher) findViewById(R.id.switcher_in_progress);
                 break;
             case 3:
-                imageSwitcher = (ImageSwitcher) findViewById(R.id.switcher_finished);
-                break;
+                Intent notificationIntent = new Intent(this, WalkDone.class);
+                startActivity(notificationIntent);
             default:
                 break;
         }
         imageSwitcher.setInAnimation(aniIn);
         imageSwitcher.setOutAnimation(aniOut);
         imageSwitcher.setFactory(this);
-        imageSwitcher.setImageResource(images[index]);
-
+        imageSwitcher.setImageResource(images[0]);
+        isRunning = true;
         final Handler handler = new Handler();
         final ImageSwitcher finalImageSwitcher = imageSwitcher;
         Runnable runnable = new Runnable() {
@@ -179,6 +219,7 @@ public class WalkInProgress extends ActionBarActivity implements ViewSwitcher.Vi
             @Override
             public void run() {
                 if (isRunning) {
+                    System.out.println("Running.." + finalImageSwitcher + index);
                     index++;
                     index = index % images.length;
                     finalImageSwitcher.setImageResource(images[index]);
