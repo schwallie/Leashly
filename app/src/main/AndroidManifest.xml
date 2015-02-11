@@ -58,6 +58,11 @@
             android:name="ly.leash.Leashly.Register"
             android:label="@string/app_name"></activity>
 
+
+        <activity
+            android:name="ly.leash.Leashly.ProfileView"
+            android:label="@string/app_name"></activity>
+
         <activity
             android:name="ly.leash.Leashly.WalkInProgress"
             android:label="@string/app_name"></activity>

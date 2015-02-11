@@ -10,4 +10,6 @@
     <dimen name="customEntry">20sp</dimen>
     <dimen name="customEditText">16sp</dimen>
     <dimen name="sample_button_spacing">2dp</dimen>
+    <dimen name="between_paws">57dp</dimen>
+    <dimen name="between_texts">32dp</dimen>
 </resources>

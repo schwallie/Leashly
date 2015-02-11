@@ -11,5 +11,5 @@
     <color name="colorPrimary">#3498db</color>
     <color name="primaryColor">#2196F3</color>
     <color name="primaryColorDark">#0D47A1</color>
-
+    <color name="toolbar_red">#f44336</color>
 </resources>

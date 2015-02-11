@@ -73,6 +73,8 @@ public class POST2GCM {
                     content.createData("New Walk!", "You have a new walk waiting for you!", to_id, sender_id);
                 } else if (title.equals("AcceptWalk")) {
                     content.createData("Walker Accepted", "Your walker is on the way!", to_id, sender_id);
+                } else if (title.equals("WalkStarted")) {
+                    content.createData("Walk Started", "Your walk has started!!", to_id, sender_id);
                 } else if (title.equals("WalkDone")) {
                     content.createData("Walk Done", "Click here for details", to_id, sender_id);
                 }

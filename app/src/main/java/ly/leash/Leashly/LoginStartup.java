@@ -32,7 +32,7 @@ public class LoginStartup extends AsyncTask<String, Void, Void> {
     private final Context context;
     String username;
     GoogleCloudMessaging gcm;
-    String regid, dog_1, dog_2, dog_3;
+    String regid, dog_1, dog_2, dog_3, first_name;
     String PROJECT_NUMBER = "621850944390";
 
     public LoginStartup(String username, Context context) {
@@ -97,6 +97,7 @@ public class LoginStartup extends AsyncTask<String, Void, Void> {
             JSONObject jobj = new JSONObject(json_data);
             walker = jobj.getInt("walker");
             user_id = jobj.getInt("id");
+            first_name = jobj.getString("first_name");
             lat = jobj.getDouble("lat");
             lon = jobj.getDouble("long");
             dog_1 = jobj.getString("dog_1");
@@ -120,6 +121,7 @@ public class LoginStartup extends AsyncTask<String, Void, Void> {
                 i.putExtra("dog_1", dog_1);
                 i.putExtra("dog_2", dog_2);
                 i.putExtra("dog_3", dog_3);
+                i.putExtra("first_name", first_name);
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(i);
             } else {
@@ -142,7 +144,7 @@ public class LoginStartup extends AsyncTask<String, Void, Void> {
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
-                String msg = "";
+                String msg;
                 try {
                     if (gcm == null) {
                         gcm = GoogleCloudMessaging.getInstance(context);

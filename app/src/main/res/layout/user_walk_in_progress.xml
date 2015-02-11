@@ -25,11 +25,10 @@
                 android:id="@+id/textView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/switcher_accept"
-                android:layout_alignStart="@id/switcher_accept"
-                android:layout_alignTop="@+id/switcher_accept"
-                android:layout_marginLeft="60dp"
-                android:layout_marginTop="10dp"
+                android:layout_above="@+id/textView11"
+                android:layout_alignLeft="@+id/textView12"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="@dimen/between_texts"
                 android:text="Pending Acceptance"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -37,10 +36,10 @@
                 android:id="@+id/textView11"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/textView2"
-                android:layout_alignStart="@+id/textView2"
-                android:layout_below="@+id/textView2"
-                android:layout_marginTop="32dp"
+                android:layout_above="@+id/textView12"
+                android:layout_alignLeft="@+id/textView12"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="@dimen/between_texts"
                 android:text="Walker on the way"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -48,10 +47,8 @@
                 android:id="@+id/textView12"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/textView11"
-                android:layout_alignStart="@+id/textView11"
-                android:layout_below="@+id/textView11"
-                android:layout_marginTop="32dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
                 android:text="Walk In Progress"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -62,7 +59,7 @@
                 android:layout_alignLeft="@+id/textView12"
                 android:layout_alignStart="@+id/textView12"
                 android:layout_below="@+id/textView12"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="@dimen/between_texts"
                 android:text="Walk Finished"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -70,8 +67,9 @@
                 android:id="@+id/switcher_accept"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="24dp"
-                android:layout_marginTop="24dp"
+                android:layout_alignBottom="@+id/textView2"
+                android:layout_marginBottom="-5dp"
+                android:layout_marginLeft="48dp"
                 android:animateFirstView="false" />
 
             <ImageSwitcher
@@ -80,23 +78,106 @@
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@+id/switcher_accept"
                 android:layout_alignStart="@+id/switcher_accept"
-                android:layout_alignTop="@+id/textView11" />
+                android:layout_alignTop="@+id/switcher_accept"
+                android:layout_marginTop="@dimen/between_paws" />
 
             <ImageSwitcher
                 android:id="@+id/switcher_in_progress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/switcher_on_way"
+                android:layout_alignLeft="@+id/switcher_accept"
                 android:layout_alignStart="@+id/switcher_on_way"
-                android:layout_alignTop="@+id/textView12" />
+                android:layout_alignTop="@+id/switcher_on_way"
+                android:layout_marginTop="@dimen/between_paws" />
 
             <ImageSwitcher
                 android:id="@+id/switcher_finished"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/switcher_in_progress"
+                android:layout_alignLeft="@+id/switcher_accept"
                 android:layout_alignStart="@+id/switcher_in_progress"
-                android:layout_alignTop="@+id/textView13" />
+                android:layout_alignTop="@+id/switcher_in_progress"
+                android:layout_marginTop="@dimen/between_paws" />
+
+            <ImageView
+                android:id="@+id/on_way_starter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/switcher_accept"
+                android:layout_alignTop="@+id/switcher_on_way"
+                android:src="@drawable/paw_outline" />
+
+            <ImageView
+                android:id="@+id/in_progress_starter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/switcher_accept"
+                android:layout_alignTop="@+id/switcher_in_progress"
+                android:src="@drawable/paw_outline" />
+
+            <ImageView
+                android:id="@+id/finished_starter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/switcher_accept"
+                android:layout_alignTop="@+id/switcher_finished"
+                android:src="@drawable/paw_outline" />
+
+            <ImageView
+                android:id="@+id/accept_finish"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/switcher_accept"
+                android:layout_alignTop="@+id/switcher_accept"
+                android:src="@drawable/paw_fill"
+                android:visibility="invisible" />
+
+            <ImageView
+                android:id="@+id/on_way_finish"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/switcher_on_way"
+                android:layout_alignTop="@+id/switcher_on_way"
+                android:src="@drawable/paw_fill"
+                android:visibility="invisible" />
+
+            <ImageView
+                android:id="@+id/in_progress_finish"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/switcher_in_progress"
+                android:layout_alignTop="@+id/switcher_in_progress"
+                android:src="@drawable/paw_fill"
+                android:visibility="invisible" />
+
+            <ImageView
+                android:id="@+id/finished_finish"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/switcher_finished"
+                android:layout_alignTop="@+id/switcher_finished"
+                android:src="@drawable/paw_fill"
+                android:visibility="invisible" />
+
+            <TextView
+                android:id="@+id/thanks_text_in_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="32dp"
+                android:text="Thanks, Chase"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/textView15"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/thanks_text_in_progress"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="8dp"
+                android:text="Check out the progress below!"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
         </RelativeLayout>
 
         <RelativeLayout

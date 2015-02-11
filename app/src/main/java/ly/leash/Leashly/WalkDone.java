@@ -1,10 +1,13 @@
 package ly.leash.Leashly;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
@@ -23,13 +26,14 @@ import ly.leash.Leashly.app.AppController;
 
 public class WalkDone extends ActionBarActivity {
     String user, id_of_walk, img_loc, map_loc, dog_1s, dog_2s, walk_notes;
-    String json_data, sender_id, dogs_walked, duration_sec;
+    String json_data, sender_id, dogs_walked, duration_sec, first_name;
     ImageLoader imageLoader = AppController.getInstance().getImageLoader();
     String distance;
     String get_url = "http://leash.ly/webservice/get_walk_deets_id.php";
     JSONParser jsonParser = new JSONParser();
     NetworkImageView img_view, map_view;
     TextView walk_notes_txt, dog_1_deets, dog_2_deets, dog_3_deets, walk_len;
+    private ActionBarDrawerToggle drawerToggle;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,8 +48,9 @@ public class WalkDone extends ActionBarActivity {
         if (extras != null) {
             user = extras.getString("id");
             id_of_walk = extras.getString("sender_id");
+            first_name = extras.getString("first_name");
             Log.d("WalkDone ID", user + "");
-            Log.d("WslkDone ID of walk", id_of_walk);
+            Log.d("WslkDone ID of walk", id_of_walk + "");
         }
         new AsyncTask<Void, Void, String>() {
             @Override
@@ -137,6 +142,18 @@ public class WalkDone extends ActionBarActivity {
 
         }.execute(null, null, null);
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            Intent person = new Intent(getBaseContext(), ProfileView.class);
+            person.putExtra("user_id", sender_id);
+            person.putExtra("first_name", first_name);
+            startActivity(person);
+        }
+        return drawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 }
 

@@ -65,7 +65,7 @@ public class FragmentText extends Fragment {
     Double lat = null;
     Double lon = null;
     Integer sort;
-    String id, sender_id, gcm_id, data, dog_1, dog_2, dog_3;
+    String id, sender_id, gcm_id, data, dog_1, dog_2, dog_3, first_name;
     String dog = "";
     String dogs_walked = "";
     String id_of_insert;
@@ -79,7 +79,8 @@ public class FragmentText extends Fragment {
     private ListView listView;
     private CustomListAdapter adapter;
 
-    public static Fragment newInstance(int position, double lat, double lon, String dog_1, String dog_2, String dog_3, String sender_id) {
+    public static Fragment newInstance(int position, double lat, double lon, String dog_1, String dog_2, String dog_3, String sender_id,
+                                       String first_name) {
         FragmentText ft = new FragmentText();
         Bundle args = new Bundle();
         args.putInt(EXTRA_POSITION, position);
@@ -89,6 +90,7 @@ public class FragmentText extends Fragment {
         args.putString("dog_2", dog_2);
         args.putString("dog_3", dog_3);
         args.putString("sender_id", sender_id);
+        args.putString("first_name", first_name);
         ft.setArguments(args); // set the arguments with the tab position
         return ft;
     }
@@ -103,6 +105,7 @@ public class FragmentText extends Fragment {
         dog_2 = getArguments().getString("dog_2");
         dog_3 = getArguments().getString("dog_3");
         sender_id = getArguments().getString("sender_id");
+        first_name = getArguments().getString("first_name");
         Log.d("sort", sort + "");
 
     }
@@ -322,6 +325,8 @@ public class FragmentText extends Fragment {
                 notificationIntent = new Intent(getActivity(), WalkInProgress.class);
                 notificationIntent.putExtra("id", msg);
                 notificationIntent.putExtra("sender_id", sender_id);
+
+                notificationIntent.putExtra("animate", 0);
                 startActivity(notificationIntent);
             }
         }.execute(null, null, null);

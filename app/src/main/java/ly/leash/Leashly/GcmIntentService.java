@@ -81,7 +81,7 @@ public class GcmIntentService extends IntentService {
     // This is just one simple example of what you might choose to do with
     // a GCM message.
 
-    private void sendNotification(String msg, String cont, String title) {
+    public void sendNotification(String msg, String cont, String title) {
         mNotificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         //        this.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -92,9 +92,27 @@ public class GcmIntentService extends IntentService {
         if (title.contains("New")) {
             notificationIntent = new Intent(this, WalkerRequest.class);
         } else if (title.contains("Accepted")) {
-
+            /* create intent */
+            Intent intent = new Intent("Animate");
+            intent.putExtra("message", 1);
+            this.sendBroadcast(intent);
             notificationIntent = new Intent(this, WalkInProgress.class);
+            notificationIntent.putExtra("animate", 1);
+        } else if (title.contains("Started")) {
+
+            Intent intent = new Intent("Animate");
+            intent.putExtra("message", 2);
+            this.sendBroadcast(intent);
+            notificationIntent = new Intent(this, WalkInProgress.class);
+            notificationIntent.putExtra("animate", 2);
+
         } else {
+
+            Intent intent = new Intent("Animate");
+            intent.putExtra("message", 3);
+            intent.putExtra("sender_id", sender_id);
+            intent.putExtra("id", msg);
+            this.sendBroadcast(intent);
             notificationIntent = new Intent(this, WalkDone.class);
         }
         notificationIntent.putExtra("id", msg);

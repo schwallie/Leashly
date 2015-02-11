@@ -24,28 +24,17 @@ import android.widget.ImageSwitcher;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TableLayout;
+import android.widget.TextView;
 import android.widget.ViewSwitcher;
-
-import java.util.Arrays;
 
 /**
  * Created by schwallie on 12/21/2014.
+ * Why
  */
 public class WalkInProgress extends ActionBarActivity implements ViewSwitcher.ViewFactory {
-    private static final String TAG = "IntroActivity";
     private final int[] images = {R.drawable.paw_outline, R.drawable.paw_fill};
     private final int interval = 1000;
-    String user;
-    ListView leftDrawerList;
-    ArrayAdapter<String> navigationDrawerAdapter;
-    Animation aniIn;
-    Animation aniOut;
-    private Toolbar toolbar;
-    private DrawerLayout drawerLayout;
-    private ActionBarDrawerToggle drawerToggle;
-    private String[] leftSliderData = {"Logout", "Contact Us"};
-    private int index = 0;
-    private boolean isRunning = false;
+    String user, sender_id, first_name;
     /* this handler will process the broadcast intent */
     private BroadcastReceiver messageReceiver = new BroadcastReceiver() {
         @Override
@@ -53,11 +42,24 @@ public class WalkInProgress extends ActionBarActivity implements ViewSwitcher.Vi
 
             // Extract data included in the Intent
             Integer message = intent.getIntExtra("message", 0);
-            System.out.println(message + "");
+            user = intent.getStringExtra("id");
+            sender_id = intent.getStringExtra("sender_id");
             startAnimatedBackground(message);
             // you could start your animation here
         }
     };
+    ListView leftDrawerList;
+    ArrayAdapter<String> navigationDrawerAdapter;
+    Animation aniIn;
+    Animation aniOut;
+    Runnable runnable;
+    Handler handler;
+    private Toolbar toolbar;
+    private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle drawerToggle;
+    private String[] leftSliderData = {"Logout", "Contact Us"};
+    private int index = 0;
+    private boolean isRunning = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,10 +74,13 @@ public class WalkInProgress extends ActionBarActivity implements ViewSwitcher.Vi
         Integer starter = 0;
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            user = extras.getString("user");
-            Log.d("ID", user + "");
+            user = extras.getString("id");
+            sender_id = extras.getString("sender_id");
+            first_name = extras.getString("first_name");
             starter = extras.getInt("animate");
         }
+        TextView welcome_txt = (TextView) findViewById(R.id.thanks_text_in_progress);
+        welcome_txt.setText("Thanks, " + first_name);
         startAnimatedBackground(starter);
     }
 
@@ -83,9 +88,7 @@ public class WalkInProgress extends ActionBarActivity implements ViewSwitcher.Vi
         leftDrawerList = (ListView) findViewById(R.id.left_drawer);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout_progress);
-        navigationDrawerAdapter = new ArrayAdapter<String>(WalkInProgress.this, android.R.layout.simple_list_item_1, leftSliderData);
-        Log.d("nsv", navigationDrawerAdapter + "");
-        Log.d("leftSliderData", Arrays.toString(leftSliderData));
+        navigationDrawerAdapter = new ArrayAdapter<>(WalkInProgress.this, android.R.layout.simple_list_item_1, leftSliderData);
         leftDrawerList.setAdapter(navigationDrawerAdapter);
         leftDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -168,13 +171,13 @@ public class WalkInProgress extends ActionBarActivity implements ViewSwitcher.Vi
         if (id == R.id.action_settings) {
             return true;
         }
-        if (drawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+        return drawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
     public void startAnimatedBackground(Integer num) {
+        if (handler != null) {
+            handler.removeCallbacks(runnable);
+        }
         ImageSwitcher imageSwitcher = null;
         aniIn = AnimationUtils.loadAnimation(this,
                 android.R.anim.fade_in);
@@ -183,38 +186,47 @@ public class WalkInProgress extends ActionBarActivity implements ViewSwitcher.Vi
 
         aniIn.setDuration(500);
         aniOut.setDuration(500);
+        ImageView accept = (ImageView) findViewById(R.id.accept_finish);
+        ImageView on_way = (ImageView) findViewById(R.id.on_way_finish);
+        Log.d("Num", num + "");
         switch (num) {
             case 0:
                 imageSwitcher = (ImageSwitcher) findViewById(R.id.switcher_accept);
                 break;
             case 1:
-                ImageView accept = (ImageView) findViewById(R.id.accept_finish);
                 accept.setVisibility(View.VISIBLE);
                 ImageView on_way_starter = (ImageView) findViewById(R.id.on_way_starter);
                 on_way_starter.setVisibility(View.INVISIBLE);
                 imageSwitcher = (ImageSwitcher) findViewById(R.id.switcher_on_way);
                 break;
             case 2:
-                ImageView on_way = (ImageView) findViewById(R.id.on_way_finish);
                 on_way.setVisibility(View.VISIBLE);
+                accept.setVisibility(View.VISIBLE);
                 ImageView in_progress_starter = (ImageView) findViewById(R.id.in_progress_starter);
                 in_progress_starter.setVisibility(View.INVISIBLE);
                 imageSwitcher = (ImageSwitcher) findViewById(R.id.switcher_in_progress);
                 break;
             case 3:
                 Intent notificationIntent = new Intent(this, WalkDone.class);
+                System.out.println("sender_id: " + sender_id);
+                System.out.println("user: " + user);
+                notificationIntent.putExtra("sender_id", sender_id);
+                notificationIntent.putExtra("id", user);
                 startActivity(notificationIntent);
+                finish();
+                return;
             default:
                 break;
         }
+        assert imageSwitcher != null;
         imageSwitcher.setInAnimation(aniIn);
         imageSwitcher.setOutAnimation(aniOut);
         imageSwitcher.setFactory(this);
         imageSwitcher.setImageResource(images[0]);
         isRunning = true;
-        final Handler handler = new Handler();
+        handler = new Handler();
         final ImageSwitcher finalImageSwitcher = imageSwitcher;
-        Runnable runnable = new Runnable() {
+        runnable = new Runnable() {
 
             @Override
             public void run() {

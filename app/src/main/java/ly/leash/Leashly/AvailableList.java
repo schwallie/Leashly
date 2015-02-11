@@ -33,14 +33,14 @@ public class AvailableList extends ActionBarActivity implements MaterialTabListe
     MaterialTabHost tabHost;
     ViewPager pager;
     ViewPagerAdapter adapter_page;
-    String sender_id, dog_1, dog_2, dog_3;
+    String sender_id, dog_1, dog_2, dog_3, first_name;
     Double lat = null;
     Double lon = null;
     private ProgressDialog pDialog;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
-    private String[] leftSliderData = {"Logout", "Contact Us"};
+    private String[] leftSliderData = {"Previous Walks", "Logout", "Contact Us"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +50,7 @@ public class AvailableList extends ActionBarActivity implements MaterialTabListe
         if (toolbar != null) {
             toolbar.setTitleTextColor(Color.WHITE);
             setSupportActionBar(toolbar);
+            getSupportActionBar().setTitle("Available Walkers");
         }
         initDrawer();
         Bundle extras = getIntent().getExtras();
@@ -60,6 +61,7 @@ public class AvailableList extends ActionBarActivity implements MaterialTabListe
             dog_1 = extras.getString("dog_1");
             dog_2 = extras.getString("dog_2");
             dog_3 = extras.getString("dog_3");
+            first_name = extras.getString("first_name");
         }
         tabHost = (MaterialTabHost) this.findViewById(R.id.tabHost);
         pager = (ViewPager) this.findViewById(R.id.pager);
@@ -86,6 +88,7 @@ public class AvailableList extends ActionBarActivity implements MaterialTabListe
 
         }
     }
+
 
     private void nitView() {
         leftDrawerList = (ListView) findViewById(R.id.left_drawer);
@@ -161,7 +164,10 @@ public class AvailableList extends ActionBarActivity implements MaterialTabListe
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
-            return true;
+            Intent person = new Intent(getBaseContext(), ProfileView.class);
+            person.putExtra("user_id", sender_id);
+            person.putExtra("first_name", first_name);
+            startActivity(person);
         }
         return drawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
@@ -204,7 +210,7 @@ public class AvailableList extends ActionBarActivity implements MaterialTabListe
         }
 
         public Fragment getItem(int num) {
-            return FragmentText.newInstance(num, lat, lon, dog_1, dog_2, dog_3, sender_id);
+            return FragmentText.newInstance(num, lat, lon, dog_1, dog_2, dog_3, sender_id, first_name);
         }
 
         @Override

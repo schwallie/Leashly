@@ -227,9 +227,6 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
             case R.id.accept_walk_btn:
                 POST2GCM.post(sender_id, "AcceptWalk", id);
                 Animation fadeout = AnimationUtils.loadAnimation(this, R.anim.fadeout);
-                //fabButton.startAnimation(fadeout);
-                //fabButton.setVisibility(View.GONE);
-                //fabButton.clearAnimation();
                 accept_walk_btn.startAnimation(fadeout);
                 accept_walk_btn.clearAnimation();
                 accept_walk_btn.setVisibility(View.GONE);
@@ -237,6 +234,7 @@ public class WalkerRequest extends ActionBarActivity implements View.OnClickList
                 start_walk_btn.startAnimation(fadein);
                 break;
             case R.id.start_walk_btn:
+                POST2GCM.post(sender_id, "WalkStarted", id);
                 Intent i = new Intent(getApplicationContext(), WalkStarted.class);
                 i.putExtra("user", id);
                 i.putExtra("sender_id", sender_id);
