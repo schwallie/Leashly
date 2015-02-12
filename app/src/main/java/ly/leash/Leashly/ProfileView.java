@@ -120,7 +120,7 @@ public class ProfileView extends ActionBarActivity implements MaterialTabListene
         }
 
         public Fragment getItem(int num) {
-            return ProfileFragmentText.newInstance(num, sender_id, first_name);
+            return ProfileFragmentText.newInstance(num, sender_id, first_name, getBaseContext());
         }
 
         @Override

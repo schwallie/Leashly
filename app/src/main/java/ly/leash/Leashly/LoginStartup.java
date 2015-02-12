@@ -94,6 +94,15 @@ public class LoginStartup extends AsyncTask<String, Void, Void> {
 
 
         try {
+            if (json_data == null) {
+                PreferenceData.setUserLoggedInStatus(context, false);
+                PreferenceData.clearLoggedInEmailAddress(context);
+                Intent i = new Intent(context, Login.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(i);
+                return null;
+
+            }
             JSONObject jobj = new JSONObject(json_data);
             walker = jobj.getInt("walker");
             user_id = jobj.getInt("id");
@@ -108,6 +117,12 @@ public class LoginStartup extends AsyncTask<String, Void, Void> {
 
         } catch (JSONException e) {
             e.printStackTrace();
+            PreferenceData.setUserLoggedInStatus(context, false);
+            PreferenceData.clearLoggedInEmailAddress(context);
+            Intent i = new Intent(context, Login.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(i);
+            return null;
             // do something
         }
         try {
@@ -157,8 +172,8 @@ public class LoginStartup extends AsyncTask<String, Void, Void> {
                     ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
                     nameValuePairs.add(new BasicNameValuePair("user_id", user_id_to_use.toString()));
                     nameValuePairs.add(new BasicNameValuePair("gcm", regid));
+                    PreferenceData.setLoggedInSecurity(context, regid);
 
-//http post
                     try {
                         HttpClient httpclient = new DefaultHttpClient();
                         HttpPost httppost = new HttpPost("http://leash.ly/webservice/register_user_gcm.php");
@@ -174,6 +189,7 @@ public class LoginStartup extends AsyncTask<String, Void, Void> {
                     msg = "Error :" + ex.getMessage();
 
                 }
+
                 return msg;
             }
         }.execute(null, null, null);

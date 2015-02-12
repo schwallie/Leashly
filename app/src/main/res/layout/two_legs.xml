@@ -75,16 +75,16 @@
         android:layout_toRightOf="@+id/textView17" />
 
     <EditText
-        android:id="@+id/prof_instruct"
+        android:id="@+id/main_instruct_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/profile_address_2"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/textView16"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
+        android:layout_alignStart="@+id/profile_address_2"
+        android:layout_below="@+id/tview1"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:background="@drawable/backtext"
         android:editable="true"
         android:ems="10"
@@ -97,7 +97,7 @@
         android:paddingEnd="5dp" />
 
     <TextView
-        android:id="@+id/textView16"
+        android:id="@+id/tview1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
