@@ -1,16 +1,25 @@
 package ly.leash.Leashly;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -31,38 +40,41 @@ public class Register extends ActionBarActivity implements OnClickListener {
     private static final String TAG_MESSAGE = "message";
     // JSON parser class
     JSONParser jsonParser = new JSONParser();
+    ListView leftDrawerList;
+    ArrayAdapter<String> navigationDrawerAdapter;
     private EditText user, pass, address_1, address_2, dog_1, dog_2, dog_3, instructions, first_name, last_name;
     private Spinner key_spinner, city_spinner, state_spinner;
     private Button mRegister;
     // Progress Dialog
     private ProgressDialog pDialog;
+    private Toolbar toolbar;
+    private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle drawerToggle;
+    private String[] leftSliderData = {"About Us", "Contact Us"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        nitView();
         if (toolbar != null) {
+            toolbar.setTitleTextColor(Color.WHITE);
             setSupportActionBar(toolbar);
         }
+        initDrawer();
         user = (EditText) findViewById(R.id.username);
         pass = (EditText) findViewById(R.id.extra);
-        address_1 = (EditText) findViewById(R.id.address_1);
-        address_2 = (EditText) findViewById(R.id.address_2);
-        dog_1 = (EditText) findViewById(R.id.dog_1);
-        dog_2 = (EditText) findViewById(R.id.dog_2);
-        dog_3 = (EditText) findViewById(R.id.dog_3);
-        instructions = (EditText) findViewById(R.id.instructions_text);
         first_name = (EditText) findViewById(R.id.first_name);
         last_name = (EditText) findViewById(R.id.last_name);
-        city_spinner = (Spinner) findViewById(R.id.spinner_cities);
-        state_spinner = (Spinner) findViewById(R.id.spinner_states);
-        key_spinner = (Spinner) findViewById(R.id.spinner_keys);
+
 
         mRegister = (Button) findViewById(R.id.register);
         mRegister.setOnClickListener(this);
-
+/*
+        city_spinner = (Spinner) findViewById(R.id.spinner_cities);
+        state_spinner = (Spinner) findViewById(R.id.spinner_states);
+        key_spinner = (Spinner) findViewById(R.id.spinner_keys);
         Spinner spinner = (Spinner) findViewById(R.id.spinner_cities);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 this, R.array.cities_array, android.R.layout.simple_spinner_item);
@@ -81,8 +93,93 @@ public class Register extends ActionBarActivity implements OnClickListener {
                 this, R.array.keys_array, android.R.layout.simple_spinner_item);
         adapter_keys.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner_keys.setAdapter(adapter_keys);
-
+*/
     }
+
+    /*
+    Start Drawer
+     */
+    private void initDrawer() {
+
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+
+            }
+        };
+        drawerLayout.setDrawerListener(drawerToggle);
+    }
+
+    private void nitView() {
+        leftDrawerList = (ListView) findViewById(R.id.left_drawer_register);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout_register);
+        navigationDrawerAdapter = new ArrayAdapter<>(Register.this, android.R.layout.simple_list_item_1, leftSliderData);
+        leftDrawerList.setAdapter(navigationDrawerAdapter);
+        leftDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                String clicked_at = leftSliderData[position];
+                switch (clicked_at) {
+                    case "Logout":
+                        PreferenceData.setUserLoggedInStatus(getBaseContext(), false);
+                        PreferenceData.clearLoggedInEmailAddress(getBaseContext());
+                        Intent i = new Intent(getBaseContext(), Login.class);
+                        startActivity(i);
+                        break;
+                    case "Contact Us":
+                        Intent i2 = new Intent(getBaseContext(), Register.class);
+                        startActivity(i2);
+                        break;
+
+                    default:
+                        break;
+                }
+
+
+            }
+        });
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        drawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.my, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return drawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
+    }
+
+    /*
+    End Drawer Toggle
+     */
 
     @Override
     public void onClick(View v) {
@@ -91,7 +188,6 @@ public class Register extends ActionBarActivity implements OnClickListener {
         new CreateUser().execute();
 
     }
-
     class CreateUser extends AsyncTask<String, String, String> {
 
 

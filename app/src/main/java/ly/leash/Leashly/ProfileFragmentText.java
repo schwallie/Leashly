@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -115,6 +116,8 @@ public class ProfileFragmentText extends Fragment {
         final ArrayAdapter<CharSequence> adapter_keys = ArrayAdapter.createFromResource(
                 V.getContext(), R.array.keys_array, android.R.layout.simple_spinner_item);
         final TextView welc = (TextView) V.findViewById(R.id.welc_dog_name_1);
+        final TextView welc2 = (TextView) V.findViewById(R.id.welc_dog_name_2);
+        final TextView welc3 = (TextView) V.findViewById(R.id.welc_dog_name_3);
 
 
         new AsyncTask<Void, Void, String>() {
@@ -224,6 +227,25 @@ public class ProfileFragmentText extends Fragment {
                         dog_1_describe_edit.setText(dog_1_describe);
                     }
                     if (dog_2_name != null) {
+                        RelativeLayout scroll2 = (RelativeLayout) V.findViewById(R.id.scroller_rel2);
+                        scroll2.setVisibility(View.VISIBLE);
+                        welc2.setText(dog_2_name);
+                        dog_2_breed_edit.setText(dog_2_breed);
+                        dog_2_name_edit.setText(dog_2_name);
+                        dog_2_color_edit.setText(dog_2_color);
+                        dog_2_describe_edit.setPadding(5, 0, 5, 0);
+                        dog_2_describe_edit.setText(dog_2_describe);
+
+                    }
+                    if (dog_3_name != null) {
+                        RelativeLayout scroll3 = (RelativeLayout) V.findViewById(R.id.scroller_rel3);
+                        scroll3.setVisibility(View.VISIBLE);
+                        welc3.setText(dog_3_name);
+                        dog_3_breed_edit.setText(dog_3_breed);
+                        dog_3_name_edit.setText(dog_3_name);
+                        dog_3_color_edit.setText(dog_3_color);
+                        dog_3_describe_edit.setPadding(5, 0, 5, 0);
+                        dog_3_describe_edit.setText(dog_3_describe);
 
                     }
 

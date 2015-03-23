@@ -1,32 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:theme="@style/Theme.AppCompat">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
 
-    <RelativeLayout
+
+    <include layout="@layout/toolbar" />
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawerLayout_front"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal">
+        android:clickable="false">
 
-        <Button
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Button
+                android:id="@+id/signup_front"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/SignIn"
-            android:id="@+id/signup_front"
-            android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:text="@string/SignIn" />
 
-        <Button
+            <Button
+                android:id="@+id/register_front"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/Register"
-            android:id="@+id/register_front"
             android:layout_below="@+id/signup_front"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="76dp" />
+                android:layout_marginTop="76dp"
+                android:text="@string/Register" />
+        </RelativeLayout>
 
-    </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/drawer_front"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="left|start"
+            android:background="#fff">
+
+            <ListView
+                android:id="@+id/left_drawer_front"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#fff"
+                android:divider="#eee"
+                android:dividerHeight="1dp" />
+
+        </RelativeLayout>
+
+    </android.support.v4.widget.DrawerLayout>
+
 </LinearLayout>

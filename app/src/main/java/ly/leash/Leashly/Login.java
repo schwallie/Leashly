@@ -2,15 +2,24 @@ package ly.leash.Leashly;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import org.apache.http.NameValuePair;
@@ -30,10 +39,17 @@ public class Login extends ActionBarActivity implements OnClickListener {
     private static final String TAG_MESSAGE = "message";
     // JSON parser class
     JSONParser jsonParser = new JSONParser();
+    ListView leftDrawerList;
+    ArrayAdapter<String> navigationDrawerAdapter;
     private EditText user, pass;
     private Button mSubmit, mRegister;
     // Progress Dialog
     private ProgressDialog pDialog;
+    private Toolbar toolbar;
+    private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle drawerToggle;
+    private String[] leftSliderData = {"About Us", "Contact Us"};
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,10 +62,12 @@ public class Login extends ActionBarActivity implements OnClickListener {
             userdata.execute(PreferenceData.getLoggedInEmailUser(this));
         }
         setContentView(R.layout.login);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        nitView();
         if (toolbar != null) {
+            toolbar.setTitleTextColor(Color.WHITE);
             setSupportActionBar(toolbar);
         }
+        initDrawer();
         // setup input fields
         user = (EditText) findViewById(R.id.username);
         pass = (EditText) findViewById(R.id.extra);
@@ -62,6 +80,85 @@ public class Login extends ActionBarActivity implements OnClickListener {
         mSubmit.setOnClickListener(this);
         mRegister.setOnClickListener(this);
 
+    }
+
+
+    private void initDrawer() {
+
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+
+            }
+        };
+        drawerLayout.setDrawerListener(drawerToggle);
+    }
+
+    private void nitView() {
+        leftDrawerList = (ListView) findViewById(R.id.left_drawer_login);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout_login);
+        navigationDrawerAdapter = new ArrayAdapter<>(Login.this, android.R.layout.simple_list_item_1, leftSliderData);
+        leftDrawerList.setAdapter(navigationDrawerAdapter);
+        leftDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                String clicked_at = leftSliderData[position];
+                switch (clicked_at) {
+                    case "Logout":
+                        PreferenceData.setUserLoggedInStatus(getBaseContext(), false);
+                        PreferenceData.clearLoggedInEmailAddress(getBaseContext());
+                        Intent i = new Intent(getBaseContext(), Login.class);
+                        startActivity(i);
+                        break;
+                    case "Contact Us":
+                        Intent i2 = new Intent(getBaseContext(), Register.class);
+                        startActivity(i2);
+                        break;
+
+                    default:
+                        break;
+                }
+
+
+            }
+        });
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        drawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.my, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return drawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
     @Override
