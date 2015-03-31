@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -28,7 +28,8 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
+                android:layout_below="@+id/textView21"
+                android:layout_marginLeft="16dp"
                 android:layout_marginTop="112dp"
                 android:drawableLeft="@drawable/mail_icon"
                 android:ems="10"
@@ -45,6 +46,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/username"
+                android:layout_marginLeft="16dp"
                 android:layout_marginTop="-2dp"
                 android:drawableLeft="@drawable/pass_icon"
                 android:ems="10"
@@ -54,12 +56,14 @@
                 android:textColorHint="#cccccc" />
 
             <Button
-                android:id="@+id/register"
+                android:id="@+id/continu"
+                style="?android:attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
-                android:hint="@string/button_register" />
+                android:text="@string/contin"
+                android:textColor="@color/toolbar_red" />
 
             <EditText
                 android:id="@+id/first_name"
@@ -70,6 +74,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/extra"
+                android:layout_marginLeft="16dp"
                 android:drawableLeft="@drawable/person_icon"
                 android:ems="10"
                 android:hint="@string/first_name_register"
@@ -85,11 +90,22 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/first_name"
+                android:layout_marginLeft="16dp"
                 android:drawableLeft="@drawable/person_icon"
                 android:ems="10"
                 android:hint="@string/last_name_register"
                 android:inputType="textPersonName"
                 android:textColorHint="#cccccc" />
+
+            <TextView
+                android:id="@+id/textView21"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="72dp"
+                android:text="Let&apos;s get started!"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
 
 
         </RelativeLayout>
@@ -111,4 +127,4 @@
         </RelativeLayout>
     </android.support.v4.widget.DrawerLayout>
 
-</LinearLayout>
+</RelativeLayout>

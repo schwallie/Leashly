@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#ffffff"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
+
+    <TextView
+        android:id="@+id/textView21"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar"
+        android:layout_centerHorizontal="true"
+        android:text="About your friend(s)"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <ScrollView
+        android:id="@+id/register_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/textView21">
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/dog_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/more_details"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignRight="@+id/continu"
+                android:layout_below="@+id/textView21"
+                android:layout_marginTop="36dp"
+                android:drawableLeft="@drawable/name"
+                android:ems="10"
+                android:hint="Name"
+                android:inputType="textEmailAddress|textWebEmailAddress"
+                android:textColorHint="#cccccc" />
+
+            <EditText
+                android:id="@+id/breed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/color_dog"
+                android:layout_marginTop="10dp"
+                android:drawableLeft="@drawable/breed"
+                android:ems="10"
+                android:hint="Breed(s)"
+                android:inputType="textPassword"
+                android:textColorHint="#cccccc" />
+
+            <EditText
+                android:id="@+id/color_dog"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignRight="@+id/dog_name"
+                android:layout_below="@+id/dog_name"
+                android:layout_marginTop="10dp"
+                android:drawableLeft="@drawable/color_dog"
+                android:ems="10"
+                android:hint="Color(s)"
+                android:inputType="textPersonName"
+                android:textColorHint="#cccccc" />
+
+
+            <EditText
+                android:id="@+id/more_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/breed"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignRight="@+id/breed"
+                android:layout_below="@+id/breed"
+                android:layout_marginTop="10dp"
+                android:drawableLeft="@drawable/three_dots"
+                android:ems="10"
+                android:hint="Default Instructions for every walk (Any details that you always want the walker to see)"
+                android:inputType="textMultiLine"
+                android:lines="4"
+                android:minLines="4"
+                android:nestedScrollingEnabled="true"
+                android:textColorHint="#cccccc" />
+
+            <Button
+                android:id="@+id/upld"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/more_details"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:text="Upload a picture"
+                android:textColor="@color/toolbar_red" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/continu"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentStart="false"
+                    android:layout_gravity="bottom"
+                    android:layout_weight="1"
+                    android:text="@string/contin"
+                    android:textColor="@color/toolbar_red" />
+
+                <Button
+                    android:id="@+id/add_more"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="false"
+                    android:layout_gravity="bottom"
+                    android:layout_weight="1"
+                    android:text="Add another pup"
+                    android:textColor="@color/toolbar_red" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawerLayout_register"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false">
+
+        <RelativeLayout
+            android:id="@+id/drawer_login"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="left|start"
+            android:background="#fff">
+
+            <ListView
+                android:id="@+id/left_drawer_register"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#fff"
+                android:divider="#eee"
+                android:dividerHeight="1dp" />
+        </RelativeLayout>
+    </android.support.v4.widget.DrawerLayout>
+
+</RelativeLayout>

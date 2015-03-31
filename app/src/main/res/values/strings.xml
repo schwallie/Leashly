@@ -53,7 +53,8 @@
     <string name="Username">Username</string>
     <string name="password">Password</string>
     <string name="login_button">Login</string>
-    <string name="register_button">Register</string>
+    <string name="register_button">Need to Register?</string>
+    <string name="contin">Continue...</string>
     <string name="email_text">E-Mail</string>
     <string name="password_register">Password</string>
     <string name="button_register">Register</string>

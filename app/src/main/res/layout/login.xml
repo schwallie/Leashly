@@ -16,61 +16,72 @@
         android:clickable="false">
 
         <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/login_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+            android:id="@+id/login_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
 
             <Button
-        android:id="@+id/register"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/login"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/login"
-        android:layout_marginBottom="25dp"
-        android:text="@string/register_button" />
+                android:id="@+id/register"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginBottom="25dp"
+                android:text="@string/register_button"
+                android:textColor="@color/toolbar_red" />
 
-    <Button
-        android:id="@+id/login"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/register"
-        android:layout_alignLeft="@+id/extra"
-        android:layout_alignRight="@+id/extra"
-        android:text="@string/login_button" />
+            <Button
+                android:id="@+id/login"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/extra"
+                android:layout_centerHorizontal="true"
+                android:text="@string/login_button"
+                android:textColor="@color/toolbar_red" />
 
-    <EditText
-        android:id="@+id/extra"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/username"
-        android:layout_alignStart="@+id/username"
-        android:layout_below="@+id/username"
-        android:drawableLeft="@drawable/pass_icon"
-        android:drawablePadding="2dp"
-        android:ems="10"
-        android:hint="Password"
-        android:inputType="textPassword">
+            <EditText
+                android:id="@+id/extra"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/username"
+                android:drawableLeft="@drawable/pass_icon"
+                android:drawablePadding="2dp"
+                android:ems="10"
+                android:hint="Password"
+                android:inputType="textPassword">
 
-        <requestFocus />
-    </EditText>
+                <requestFocus />
+            </EditText>
 
 
             <EditText
-        android:id="@+id/username"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
+                android:id="@+id/username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="152dp"
                 android:drawableLeft="@drawable/mail_icon"
                 android:drawablePadding="2dp"
-        android:ems="10"
+                android:ems="10"
                 android:hint="E-Mail"
-        android:inputType="textEmailAddress" />
+                android:inputType="textEmailAddress" />
 
 
-</RelativeLayout>
+        </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/drawer_login"
