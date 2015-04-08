@@ -21,19 +21,19 @@
         android:text="About your friend(s)"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
+
     <ScrollView
         android:id="@+id/register_layout"
-        android:layout_width="match_parent"
+                android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/textView21">
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/textView21"
+        android:fillViewport="true">
 
         <LinearLayout
-
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <EditText
@@ -43,6 +43,8 @@
                 android:layout_alignLeft="@+id/more_details"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
                 android:layout_alignRight="@+id/continu"
                 android:layout_below="@+id/textView21"
                 android:layout_marginTop="36dp"
@@ -52,8 +54,9 @@
                 android:inputType="textEmailAddress|textWebEmailAddress"
                 android:textColorHint="#cccccc" />
 
+
             <EditText
-                android:id="@+id/breed"
+                android:id="@+id/dog_breed"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -69,10 +72,11 @@
                 android:textColorHint="#cccccc" />
 
             <EditText
-                android:id="@+id/color_dog"
+                android:id="@+id/dog_color"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignRight="@+id/dog_name"
@@ -86,12 +90,14 @@
 
 
             <EditText
-                android:id="@+id/more_details"
+                android:id="@+id/dog_default_inst"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@+id/breed"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
                 android:layout_alignRight="@+id/breed"
                 android:layout_below="@+id/breed"
                 android:layout_marginTop="10dp"
@@ -105,7 +111,7 @@
                 android:textColorHint="#cccccc" />
 
             <Button
-                android:id="@+id/upld"
+                android:id="@+id/upload"
                 style="?android:attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -118,8 +124,8 @@
 
             <LinearLayout
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:orientation="horizontal">
 
                 <Button
@@ -130,6 +136,7 @@
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
+                    android:layout_alignParentLeft="false"
                     android:layout_alignParentStart="false"
                     android:layout_gravity="bottom"
                     android:layout_weight="1"
@@ -152,27 +159,5 @@
         </LinearLayout>
     </ScrollView>
 
-    <android.support.v4.widget.DrawerLayout
-        android:id="@+id/drawerLayout_register"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clickable="false">
-
-        <RelativeLayout
-            android:id="@+id/drawer_login"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="left|start"
-            android:background="#fff">
-
-            <ListView
-                android:id="@+id/left_drawer_register"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#fff"
-                android:divider="#eee"
-                android:dividerHeight="1dp" />
-        </RelativeLayout>
-    </android.support.v4.widget.DrawerLayout>
 
 </RelativeLayout>

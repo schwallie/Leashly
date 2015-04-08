@@ -9,6 +9,16 @@
 
     <include layout="@layout/toolbar" />
 
+    <TextView
+        android:id="@+id/textView21"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="72dp"
+        android:text="Let&apos;s get started!"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawerLayout_register"
         android:layout_width="match_parent"
@@ -96,16 +106,6 @@
                 android:hint="@string/last_name_register"
                 android:inputType="textPersonName"
                 android:textColorHint="#cccccc" />
-
-            <TextView
-                android:id="@+id/textView21"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="72dp"
-                android:text="Let&apos;s get started!"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
 
 
         </RelativeLayout>

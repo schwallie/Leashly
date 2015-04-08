@@ -60,11 +60,14 @@
         <activity
             android:name="ly.leash.Leashly.RegisterPets"
             android:label="@string/app_name"
-            android:windowSoftInputMode="adjustResize"></activity>
+            android:parentActivityName="ly.leash.Leashly.Register"
+            android:windowSoftInputMode="adjustResize">>
+        </activity>
         <activity
             android:name="ly.leash.Leashly.Register"
             android:label="@string/app_name"
-            android:windowSoftInputMode="adjustResize"></activity>
+            android:parentActivityName="ly.leash.Leashly.Login">
+        android:windowSoftInputMode="adjustResize"></activity>
 
 
         <activity

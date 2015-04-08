@@ -169,7 +169,7 @@ public class Login extends ActionBarActivity implements OnClickListener {
                 new AttemptLogin().execute();
                 break;
             case R.id.register:
-                Intent i = new Intent(this, RegisterPets.class);
+                Intent i = new Intent(this, Register.class);
                 startActivity(i);
                 break;
 
