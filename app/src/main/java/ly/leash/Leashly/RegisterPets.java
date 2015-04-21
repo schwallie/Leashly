@@ -2,18 +2,30 @@ package ly.leash.Leashly;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
+import android.os.Parcelable;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.NavUtils;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
@@ -21,21 +33,27 @@ import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.soundcloud.android.crop.Crop;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -57,14 +75,18 @@ public class RegisterPets extends ActionBarActivity implements View.OnClickListe
     private Spinner key_spinner, city_spinner, state_spinner;
     private Button mRegister, mAddMore, upload;
     private Integer image_uploaded = 0;
+    private Integer num;
     // Progress Dialog
     private ProgressDialog pDialog;
-    private String img_name, fileName, loc_of_image;
+    private String img_name, fileName, loc_of_image, id;
     private static final String TAG_SUCCESS = "success";
     private static final String TAG_MESSAGE = "message";
     private Toolbar toolbar;
     private Uri fileUri;
-    private String[] leftSliderData = {"About Us", "Contact Us"};
+    private ImageView picture;
+    private Uri outputFileUri;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +99,12 @@ public class RegisterPets extends ActionBarActivity implements View.OnClickListe
             toolbar.setTitleTextColor(Color.WHITE);
             setSupportActionBar(toolbar);
         }
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            id = extras.getString("id");
+            num = extras.getInt("num");
+        }
         //initDrawer();
         toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         dog_name = (EditText) findViewById(R.id.dog_name);
@@ -88,11 +116,179 @@ public class RegisterPets extends ActionBarActivity implements View.OnClickListe
         mRegister.setOnClickListener(this);
 
         mAddMore = (Button) findViewById(R.id.add_more);
-        mAddMore.setOnClickListener(this);
+        if(num < 3) {
+            mAddMore.setOnClickListener(this);
+        } else {
+            mAddMore.setActivated(false);
+        }
 
         upload = (Button) findViewById(R.id.upload);
         upload.setOnClickListener(this);
     }
+
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent result) {
+        Log.d("Crop", requestCode+"+++" + Crop.REQUEST_PICK+"+++" + resultCode + "+++" + RESULT_OK + "++++" + Crop.REQUEST_CROP);
+        if (requestCode == Crop.REQUEST_PICK && resultCode == RESULT_OK) {
+            beginCrop(getPickImageResultUri(result));
+        } else if (requestCode == Crop.REQUEST_CROP) {
+            handleCrop(resultCode, result);
+        }
+    }
+
+    private void beginCrop(Uri source) {
+        Uri outputUri = Uri.fromFile(new File(getCacheDir(), "cropped"));
+        new Crop(source).output(outputUri).asSquare().start(this);
+    }
+
+    private void handleCrop(int resultCode, Intent result) {
+        if (resultCode == RESULT_OK) {
+            //resultView.setImageURI(null);
+            //resultView.setImageURI(Crop.getOutput(result
+            Bitmap bitmap = BitmapFactory.decodeFile(Crop.getOutput(result).getPath());
+            SetImage(bitmap);
+
+        } else if (resultCode == Crop.RESULT_ERROR) {
+            Toast.makeText(this, Crop.getError(result).getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Create a chooser intent to select the  source to get image from.<br/>
+     * The source can be camera's  (ACTION_IMAGE_CAPTURE) or gallery's (ACTION_GET_CONTENT).<br/>
+     * All possible sources are added to the  intent chooser.
+     */
+    public Intent getPickImageChooserIntent() {
+
+// Determine Uri of camera image to  save.
+        Uri outputFileUri =  getCaptureImageOutputUri();
+
+        List<Intent> allIntents = new  ArrayList<>();
+        PackageManager packageManager =  getPackageManager();
+
+// collect all camera intents
+        Intent captureIntent = new  Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        List<ResolveInfo> listCam =  packageManager.queryIntentActivities(captureIntent, 0);
+        for (ResolveInfo res : listCam) {
+            Intent intent = new  Intent(captureIntent);
+            intent.setComponent(new  ComponentName(res.activityInfo.packageName, res.activityInfo.name));
+            intent.setPackage(res.activityInfo.packageName);
+            if (outputFileUri != null) {
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+            }
+            allIntents.add(intent);
+        }
+
+// collect all gallery intents
+        Intent galleryIntent = new  Intent(Intent.ACTION_GET_CONTENT);
+        galleryIntent.setType("image/*");
+        List<ResolveInfo> listGallery =  packageManager.queryIntentActivities(galleryIntent, 0);
+        for (ResolveInfo res : listGallery) {
+            Intent intent = new  Intent(galleryIntent);
+            intent.setComponent(new  ComponentName(res.activityInfo.packageName, res.activityInfo.name));
+            intent.setPackage(res.activityInfo.packageName);
+            allIntents.add(intent);
+        }
+
+// the main intent is the last in the  list (fucking android) so pickup the useless one
+        Intent mainIntent =  allIntents.get(allIntents.size() - 1);
+        for (Intent intent : allIntents) {
+            if  (intent.getComponent().getClassName().equals("com.android.documentsui.DocumentsActivity"))  {
+                mainIntent = intent;
+                break;
+            }
+        }
+        allIntents.remove(mainIntent);
+
+// Create a chooser from the main  intent
+        Intent chooserIntent =  Intent.createChooser(mainIntent, "Select source");
+
+// Add all other intents
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS,  allIntents.toArray(new Parcelable[allIntents.size()]));
+
+        return chooserIntent;
+    }
+
+    /**
+     * Get URI to image received from capture  by camera.
+     */
+    private Uri getCaptureImageOutputUri() {
+        Uri outputFileUri = null;
+        File getImage = getExternalCacheDir();
+        if (getImage != null) {
+            outputFileUri = Uri.fromFile(new  File(getImage.getPath(), "pickImageResult.jpeg"));
+        }
+        return outputFileUri;
+    }
+
+    /**
+     * Get the URI of the selected image from  {@link #getPickImageChooserIntent()}.<br/>
+     * Will return the correct URI for camera  and gallery image.
+     *
+     * @param data the returned data of the  activity result
+     */
+    public Uri getPickImageResultUri(Intent  data) {
+        boolean isCamera = true;
+        if (data != null) {
+            String action = data.getAction();
+            isCamera = action != null  && action.equals(MediaStore.ACTION_IMAGE_CAPTURE);
+        }
+        return isCamera ?  getCaptureImageOutputUri() : data.getData();
+    }
+
+
+
+
+
+
+
+
+    private void openImageIntent() {
+
+// Determine Uri of camera image to save.
+        final File root = new File(Environment.getExternalStorageDirectory() + File.separator + "MyDir" + File.separator);
+        root.mkdirs();
+        final String fname = "Leashly_" + System.currentTimeMillis() + ".jpg";
+        final File sdImageMainDirectory = new File(root, fname);
+        outputFileUri = Uri.fromFile(sdImageMainDirectory);
+
+        // Camera.
+        final List<Intent> cameraIntents = new ArrayList<Intent>();
+        final Intent captureIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        final PackageManager packageManager = getPackageManager();
+        final List<ResolveInfo> listCam = packageManager.queryIntentActivities(captureIntent, 0);
+        for(ResolveInfo res : listCam) {
+            final String packageName = res.activityInfo.packageName;
+            final Intent intent = new Intent(captureIntent);
+            intent.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
+            intent.setPackage(packageName);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+            intent.putExtra("crop", "true");
+            intent.putExtra("aspectX", 1);
+            intent.putExtra("aspectY", 1);
+            intent.putExtra("outputX", 200);
+            intent.putExtra("outputY", 200);
+            intent.putExtra("noFaceDetection", true);
+            intent.putExtra("return-data", true);
+            cameraIntents.add(intent);
+        }
+
+        // Filesystem.
+        final Intent galleryIntent = new Intent();
+        galleryIntent.setType("image/*");
+        galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+
+        // Chooser of filesystem options.
+        final Intent chooserIntent = Intent.createChooser(galleryIntent, "Select Source");
+
+        // Add the camera options.
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, cameraIntents.toArray(new Parcelable[cameraIntents.size()]));
+
+        startActivityForResult(chooserIntent, 1);
+    }
+
 
     /*
     Start Drawer
@@ -116,24 +312,96 @@ public class RegisterPets extends ActionBarActivity implements View.OnClickListe
         // TODO Auto-generated method stub
         switch (v.getId()) {
             case R.id.upload:
-                dispatchTakePictureIntent();
-                break;
+                startActivityForResult(getPickImageChooserIntent(), 9162);
+                //openImageIntent();
+                //Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                //intent.setType("image/*");
+                //fileUri = getOutputMediaFileUri(1); // create a file to save the image
+                //intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file name
+                //startActivityForResult(intent, 1);
             case R.id.continu:
                 break;
             case R.id.add_more:
+                // Need to check for details
+                Intent intent_add = new Intent(RegisterPets.this, RegisterPets.class);
+                intent_add.putExtra("id", id);
+                intent_add.putExtra("num", num+1);
+                startActivity(intent_add);
                 break;
         }
     }
+    /*@Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            if (requestCode == 1) {
+                final boolean isCamera;
+                if (data == null) {
+                    isCamera = true;
+                } else {
+                    final String action = data.getAction();
+                    if (action == null) {
+                        isCamera = false;
+                    } else {
+                        isCamera = action.equals(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                    }
+                }
+
+                Uri selectedImageUri = null;
+                String selectedImagePath = null;
+                if (isCamera) {
+                    selectedImageUri = outputFileUri;
+                } else {
+                    Uri uri = data.getData();
+                    if (uri != null) {
+                        try {
+                            if( uri == null ) {
+                                selectedImageUri = uri;
+                            } else {
+                                // get the id of the image selected by the user
+                                String wholeID = DocumentsContract.getDocumentId(data.getData());
+                                String id = wholeID.split(":")[1];
+
+                                String[] projection = { MediaStore.Images.Media.DATA };
+                                String whereClause = MediaStore.Images.Media._ID + "=?";
+                                Cursor cursor = getContentResolver().query(getUri(), projection, whereClause, new String[]{id}, null);
+                                if( cursor != null ){
+                                    int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                                    if (cursor.moveToFirst()) {
+                                        selectedImagePath = cursor.getString(column_index);
+                                    }
+
+                                    cursor.close();
+                                } else {
+                                    selectedImageUri = uri;
+                                }
+                            }
+                        } catch (Exception e) {
+                            Log.d("Broken!", e.toString());
+                        }
+                    }
+                }
+                if(selectedImageUri != null) {
+                    Log.d("selectImageUri", selectedImageUri.toString());
+                    selectedImagePath = selectedImageUri.getPath();
+                }
+                Bitmap bitmap = BitmapFactory.decodeFile(selectedImagePath);
+                SetImage(bitmap);
+            }
+        }
+    }*/
+    private Uri getUri() {
+        String state = Environment.getExternalStorageState();
+        if(!state.equalsIgnoreCase(Environment.MEDIA_MOUNTED))
+            return MediaStore.Images.Media.INTERNAL_CONTENT_URI;
+
+        return MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+    }
     /**
-     * Create a file Uri for saving an image or video
+     * Create a File for saving an image or video
      */
     private Uri getOutputMediaFileUri(int type) {
         return Uri.fromFile(getOutputMediaFile(type));
     }
-
-    /**
-     * Create a File for saving an image or video
-     */
     private File getOutputMediaFile(int type) {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
@@ -165,135 +433,6 @@ public class RegisterPets extends ActionBarActivity implements View.OnClickListe
 
         return mediaFile;
     }
-
-    protected void dispatchTakePictureIntent() {
-        // create Intent to take a picture and return control to the calling application
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        fileUri = getOutputMediaFileUri(1); // create a file to save the image
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file name
-        // start the image capture Intent
-        startActivityForResult(intent, 1);
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
-            // Image captured and saved to fileUri specified in the Intent
-            Log.d("requestCode", requestCode + "");
-            loc_of_image = fileUri.getPath();
-            Log.d("Image_Loc", loc_of_image);
-            try {
-                camera_done = 1;
-                UploadToServer uts;
-                uts = new UploadToServer();
-                Log.d("Executing", "1");
-                uts.execute(loc_of_image);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            Log.d("Image capture failed", "fail");
-            // Image capture failed, advise user
-        }
-    }
-
-    public class UploadToServer extends AsyncTask<String, String, Integer> {
-
-        String upLoadServerUri = "http://leash.ly/webservice/upload_dog_image.php";
-        int serverResponseCode = 0;
-
-        @Override
-        public void onPostExecute(Integer serverResponse) {
-            File file = new File(fileName);
-            boolean deleted = file.delete();
-            if (serverResponseCode == 200) {
-                Toast.makeText(RegisterPets.this, "Image successfully uploaded!", Toast.LENGTH_LONG).show();
-            }
-            image_uploaded = 1;
-        }
-
-
-        public Integer doInBackground(String... args) {
-            fileName = args[0];
-            HttpURLConnection conn;
-            DataOutputStream dos;
-            String lineEnd = "\r\n";
-            String twoHyphens = "--";
-            String boundary = "*****";
-            int bytesRead, bytesAvailable, bufferSize;
-            byte[] buffer;
-            int maxBufferSize = 1 * 1024 * 1024;
-            File sourceFile = new File(args[0]);
-            while (!sourceFile.exists()) {
-                System.out.println("WAITING...");
-            }
-
-            try { // open a URL connection to the Servlet
-                FileInputStream fileInputStream = new FileInputStream(sourceFile);
-                URL url = new URL(upLoadServerUri);
-                conn = (HttpURLConnection) url.openConnection(); // Open a HTTP  connection to  the URL
-                conn.setDoInput(true); // Allow Inputs
-                conn.setDoOutput(true); // Allow Outputs
-                conn.setUseCaches(false); // Don't use a Cached Copy
-                conn.setConnectTimeout(50000);
-                conn.setRequestMethod("POST");
-                conn.setRequestProperty("Connection", "Keep-Alive");
-                conn.setRequestProperty("ENCTYPE", "multipart/form-data");
-                conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
-                conn.setRequestProperty("uploaded_file", fileName);
-                dos = new DataOutputStream(conn.getOutputStream());
-
-                dos.writeBytes(twoHyphens + boundary + lineEnd);
-                dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";filename=\"" + fileName + "\"" + lineEnd);
-                dos.writeBytes(lineEnd);
-
-                bytesAvailable = fileInputStream.available(); // create a buffer of  maximum size
-
-                bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                buffer = new byte[bufferSize];
-
-                // read file and write it into form...
-                bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-
-                while (bytesRead > 0) {
-                    dos.write(buffer, 0, bufferSize);
-                    bytesAvailable = fileInputStream.available();
-                    bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                    bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-                }
-
-                // send multipart form data necessary after file data...
-                dos.writeBytes(lineEnd);
-                dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-
-                // Responses from the server (code and message)
-                serverResponseCode = conn.getResponseCode();
-                String serverResponseMessage = conn.getResponseMessage();
-
-                Log.i("uploadFile", "HTTP Response is : " + serverResponseMessage + ": " + serverResponseCode);
-
-                //close the streams //
-                fileInputStream.close();
-                dos.flush();
-                dos.close();
-            } catch (MalformedURLException ex) {
-                //dialog.dismiss();
-                ex.printStackTrace();
-                //Toast.makeText(UploadImage.this, "MalformedURLException", Toast.LENGTH_SHORT).show();
-                Log.e("Upload file to server", "error: " + ex.getMessage(), ex);
-            } catch (Exception e) {
-                //dialog.dismiss();
-                e.printStackTrace();
-                //Toast.makeText(UploadImage.this, "Exception : " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.e("Upload file Exception", "Exception : " + e.getMessage(), e);
-            }
-            //dialog.dismiss();
-            return serverResponseCode;
-        }
-    }
-
 
     class CreateDog extends AsyncTask<String, String, Integer> {
 
@@ -361,5 +500,69 @@ public class RegisterPets extends ActionBarActivity implements View.OnClickListe
             }
         }
 
+    }
+
+
+
+  /*  public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && data != null && data.getData() != null) {
+                Uri selectedImageUri = data.getData();
+                //if (Build.VERSION.SDK_INT < 22) {
+                String selectedImagePath = fileUri.getPath();
+                Bitmap bitmap = BitmapFactory.decodeFile(selectedImagePath);
+                SetImage(bitmap);
+            }
+        }
+*/
+
+    private void SetImage(Bitmap image) {
+        //this.picture.setImageBitmap(image);
+
+        // upload
+        String imageData = encodeTobase64(image);
+        final List<NameValuePair> params = new ArrayList<NameValuePair>();
+        params.add(new BasicNameValuePair("image", imageData));
+        params.add(new BasicNameValuePair("CustomerID", id));
+        params.add(new BasicNameValuePair("Num", num+""));
+
+        new AsyncTask<ApiConnector,Long, Boolean >() {
+            @Override
+            protected Boolean doInBackground(ApiConnector... apiConnectors) {
+                return apiConnectors[0].uploadImageToserver(params);
+            }
+        }.execute(new ApiConnector());
+
+    }
+
+    public static String encodeTobase64(Bitmap image) {
+        System.gc();
+
+        if (image == null)return null;
+
+        Bitmap immagex = image;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        immagex.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+
+        byte[] b = baos.toByteArray();
+
+        String imageEncoded = Base64.encodeToString(b, Base64.DEFAULT); // min minSdkVersion 8
+
+        return imageEncoded;
+    }
+
+
+    public String getPath(Uri uri) {
+        if( uri == null ) {
+            return null;
+        }
+        String[] projection = { MediaStore.Images.Media.DATA };
+        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
+        if( cursor != null ){
+            int column_index = cursor
+                    .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        }
+        return uri.getPath();
     }
 }

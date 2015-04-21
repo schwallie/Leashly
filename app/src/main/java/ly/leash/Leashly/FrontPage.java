@@ -122,7 +122,7 @@ public class FrontPage extends ActionBarActivity implements View.OnClickListener
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.my, menu);
+        getMenuInflater().inflate(R.menu.no_icon, menu);
         return true;
     }
 

@@ -149,6 +149,8 @@ public class Register extends ActionBarActivity implements OnClickListener {
             Log.d("Success", success+"");
             if (success == 1) {
                 Intent i = new Intent(Register.this, RegisterPets.class);
+                i.putExtra("id", user.getText().toString());
+                i.putExtra("num", 1);
                 startActivity(i);
             }
         }

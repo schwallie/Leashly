@@ -58,7 +58,8 @@
                 android:drawablePadding="2dp"
                 android:ems="10"
                 android:hint="Password"
-                android:inputType="textPassword">
+                android:inputType="textPassword"
+                android:layout_marginLeft="10dp">
 
                 <requestFocus />
             </EditText>
@@ -68,17 +69,30 @@
                 android:id="@+id/username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginTop="152dp"
                 android:drawableLeft="@drawable/mail_icon"
                 android:drawablePadding="2dp"
                 android:ems="10"
                 android:hint="E-Mail"
-                android:inputType="textEmailAddress" />
+                android:inputType="textEmailAddress"
+                android:layout_below="@+id/logo"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="20dp" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/logo"
+                android:src="@drawable/logo"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp" />
 
 
         </RelativeLayout>

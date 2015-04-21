@@ -65,6 +65,7 @@ public class Login extends ActionBarActivity implements OnClickListener {
         nitView();
         if (toolbar != null) {
             toolbar.setTitleTextColor(Color.WHITE);
+            toolbar.setTitle("");
             setSupportActionBar(toolbar);
         }
         initDrawer();
@@ -148,7 +149,7 @@ public class Login extends ActionBarActivity implements OnClickListener {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.my, menu);
+        getMenuInflater().inflate(R.menu.no_icon, menu);
         return true;
     }
 
